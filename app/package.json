@@ -1,0 +1,50 @@
+{
+  "name": "co-processor",
+  "version": "0.0.1",
+  "description": "An application that allows to check for firmata FW on the balenaFin co-processor and flashes it if none is found.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/balena-io-playground/balena-fin-firmata-flash.git"
+  },
+  "keywords": [
+    "balena",
+    "fin",
+    "balenafin",
+    "io",
+    "firmata",
+    "co",
+    "processor",
+    "coprocessor",
+    "artik020",
+    "bgm111",
+    "flash",
+    "firmware",
+    "serial",
+    "port"
+  ],
+  "author": "Carlo Maria Curinga <carlo@balena.io>",
+  "license": "Apache-2.0",
+  "jshintConfig": {
+    "esversion": 8
+  },
+  "bugs": {
+    "url": "https://github.com/balena-io-playground/balena-fin-firmata-flash/issues"
+  },
+  "homepage": "https://github.com/balena-io-playground/balena-fin-firmata-flash#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "debug": "^4.1.1",
+    "express": "^4.17.1",
+    "firmata": "^2.2.0",
+    "node-gtk": "^0.4.0",
+    "onoff": "^6.0.0",
+    "request": "^2.88.2",
+    "request-promise-native": "^1.0.8",
+    "serialport": "^9.0.0"
+  }
+}

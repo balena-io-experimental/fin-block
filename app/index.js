@@ -3,6 +3,7 @@
 const express = require('express');
 const compression = require('compression');
 const bodyParser = require('body-parser');
+const dateformat = require('dateformat');
 
 const gi = require('node-gtk');
 const Fin = gi.require('Fin', '0.2');
@@ -17,10 +18,43 @@ const Flasher = require(__dirname + '/flasher.js');
 const app = express();
 const flasher = Flasher(BALENA_FIN_REVISION, supervisor, firmata);
 
+const balena = require('balena-sdk');
+
+const sdk = balena.fromSharedOptions();
+var token = process.env.BALENA_API_KEY || "";
+console.log(`Using token ${token}`);
+sdk.auth.loginWithToken(token);
+
+var uuid = process.env.BALENA_DEVICE_UUID || "";
+console.log(`Using UUID ${uuid}`);
+const BALENA_DEVICE_UUID = uuid;
+
+let getFirmware = function() {
+  return new Promise((resolve, reject) => {
+      var data = firmata.queryFirmware()
+      console.log(`returning firmware version ${data}`);
+      resolve(data);
+  });
+};
+
+const setTag = (key, val) => {
+	console.log(`setting ${key} to ${val}...`);
+	sdk.models.device.tags.set(BALENA_DEVICE_UUID, key, val);
+};
+
+const removeTag = (key) => {
+  console.log(`removing tag ${key}`);
+  sdk.models.device.tags.remove(BALENA_DEVICE_UUID, key);
+}
+
 const shutdown = (delay, timeout) => {
   return supervisor.checkForOngoingUpdate()
       .then(() => {
         firmata.sleep(parseInt(delay), parseInt(timeout));
+        setTag('cm-power', 'sleeping');
+        var parsedDate = new Date()
+        var newDate = new Date(parsedDate.getTime() + (1000 * seconds))
+        setTag('time-until-awake', dateFormat(newDate, "isoDateTime"))
         return supervisor.shutdown();
       })
       .catch(() => { throw new Error('Device is not Idle, likely updating, will not shutdown'); });
@@ -99,10 +133,9 @@ app.post('/v1/sleep/:delay/:timeout', (req, res) => {
 });
 
 app.get('/v1/firmware', (req, res) => {
-  firmata.queryFirmware().then((data) => {
-    res.send(data)
+  getFirmware().then((data) => { 
+    res.send(data.implementationVersion);
   });
-    
 });
 
 app.listen(SERVER_PORT, () => {
@@ -114,6 +147,12 @@ process.on('SIGINT', () => {
   flasher.stop();
   process.exit();
 });
+
+getFirmware().then((data) => { 
+  setTag('copro-firmware', data.implementationVersion);
+});
+setTag('cm-power', 'awake');
+removeTag('time-until-awake');
 
 if (process.env.FLASH_ON_START_FILE) {
   const firmwareFile = process.env.FLASH_ON_START_FILE;

@@ -98,6 +98,13 @@ app.post('/v1/sleep/:delay/:timeout', (req, res) => {
       });
 });
 
+app.get('/v1/firmware', (req, res) => {
+  firmata.queryFirmware().then((data) => {
+    res.send(data)
+  });
+    
+});
+
 app.listen(SERVER_PORT, () => {
   console.log('balenaFin revision', BALENA_FIN_REVISION);
   console.log('server listening on port ' + SERVER_PORT);

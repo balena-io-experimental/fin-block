@@ -33,12 +33,12 @@ let firmwareMeta = {name:'StandardFirmata',version:'v2.0.1'};
 
 let getFirmware = function() {
   return new Promise((resolve, reject) => {
-      var data = firmata.queryFirmware()
-      .then(() => {
+      firmata.queryFirmware()
+      .then((data) => {
         console.log(`returning firmware version ${data}`);
         resolve(data);
       })
-      .catch(() => {
+      .catch((data) => {
         reject(data)
       })
   });
@@ -195,12 +195,13 @@ setTag('time-until-awake', 'N/A');
 
 firmata.queryFirmware()
 .then((data)=>{
+  setTag('copro-firmata', data.implementationVersion);
   console.log(`${data.firmataName} @ ${data.implementationVersion}`)
   if(process.env.FIRMATA_VERSION){
     firmwareMeta = {name: 'StandardFirmata', version: process.env.FIRMATA_VERSION};
   }
   else if (data.firmataName !== '' || data.implementationVersion !== '') {
-    setTag('copro-firmata', firmwareMeta.version);
+    // setTag('copro-firmata', firmwareMeta.version);
   };
 })
 .catch(console.error)

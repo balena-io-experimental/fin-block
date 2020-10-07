@@ -9,7 +9,7 @@ if [[ ! -z $FIRMATA_VERSION ]]
         VERSION=$FIRMATA_VERSION
 fi
 
-FILEPATH="${FIRMWARE_PATH}${VERSION}.hex"
+FILEPATH="${FIRMWARE_PATH}v${VERSION}.hex"
 if test -f $FILEPATH
     then
         echo "Firmware already downloaded. Skipping."
@@ -17,7 +17,7 @@ if test -f $FILEPATH
         echo "Need to download firmware version ${VERSION}"
         FULL_PATH="${RELEASE_PATH}v${VERSION}/firmata.hex"
         echo "${FULL_PATH}"
-        wget ${FULL_PATH} -o "${FILEPATH}"
+        curl ${FULL_PATH} -L -o "${FILEPATH}"
 fi
 
 if [[ ! -z $FIRMATA_REPL ]]

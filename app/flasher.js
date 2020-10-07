@@ -12,7 +12,7 @@ function newFlasher(finRevision, supervisor, firmata) {
       return new Promise((resolve, reject) => {
         fs.access(`firmware/${name}`, fs.F_OK, (err) =>{
           if(err){
-            reject(new Error('Firmware not found'));
+            reject(new Error(`Firmware ${name} not found`));
             return; 
           }
 

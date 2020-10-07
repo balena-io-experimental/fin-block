@@ -44,16 +44,6 @@ let getFirmware = function() {
   });
 };
 
-const setEnv = (key, val) => {
-	console.log(`setting ${key} to ${val}...`);
-	sdk.models.device.envVar.set(BALENA_DEVICE_UUID, key, val);
-};
-
-const removeEnv = (key) => {
-  console.log(`removing tag ${key}`);
-	sdk.models.device.envVar.set(BALENA_DEVICE_UUID, key);
-};
-
 const setTag = (key, val) => {
 	console.log(`setting ${key} to ${val}...`);
 	sdk.models.device.tags.set(BALENA_DEVICE_UUID, key, val);
@@ -61,7 +51,9 @@ const setTag = (key, val) => {
 
 const removeTag = (key) => {
   console.log(`removing tag ${key}`);
-  sdk.models.device.tags.remove(BALENA_DEVICE_UUID, key);
+  sdk.models.device.tags.remove(BALENA_DEVICE_UUID, key, function(error) {
+    if (error) console.log(`INFO: Could not remove tag ${key}.`);
+});
 }
 
 const shutdown = (delay, timeout) => {
@@ -195,10 +187,7 @@ process.on('SIGINT', () => {
   process.exit();
 });
 
-// getFirmware().then((data) => { 
-//   setTag('copro-firmware', data.implementationVersion);
-// });
-// setTag('cm-power', 'awake');
+setTag('cm-power', 'awake');
 // removeTag('time-until-awake');
 
 firmata.queryFirmware()
@@ -214,12 +203,12 @@ firmata.queryFirmware()
 })
 .catch(console.error)
 .then(() => {
-  flasher.flashIfNeeded(`firmata-${firmwareMeta.version}.hex`, firmwareMeta)
-  .then((flashed) => {
-    if (!flashed) {
-      console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
-    }
-
-  })
-  .catch(console.error);
+  console.log(`flashing ${firmwareMeta.version}`)
+  // flasher.flashIfNeeded(`firmata-${firmwareMeta.version}.hex`, firmwareMeta)
+  // .then((flashed) => {
+  //   if (!flashed) {
+  //     console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
+  //   }
+  // })
+  // .catch(console.error);
 });

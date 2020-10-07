@@ -3,6 +3,7 @@ const mux = new Gpio(41, 'out');
 const { spawn } = require("child_process");
 const cmp = require('semver-compare');
 const fs = require('fs');
+const ser = require('serialport');
 
 let flashingInProgress = false;
 

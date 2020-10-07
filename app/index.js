@@ -70,7 +70,7 @@ const shutdown = (delay, timeout) => {
         setTag('fin-status', 'sleeping').then(() => {
           var parsedDate = new Date()
           var newDate = new Date(parsedDate.getTime() + (1000 * timeout))
-          setTag('time-until-awake', dateFormat(newDate, "isoDateTime")).then(() => {
+          setTag('wake-eta', dateFormat(newDate, "isoDateTime")).then(() => {
             firmata.sleep(parseInt(delay), parseInt(timeout));
             return supervisor.shutdown();
           });
@@ -198,7 +198,7 @@ process.on('SIGINT', () => {
 });
 
 setTag('fin-status', 'awake');
-setTag('time-until-awake', 'N/A');
+setTag('wake-eta', 'N/A');
 
 flasher.flashIfNeeded('firmata-' + ((process.env.FIRMATA_VERSION) ? process.env.FIRMATA_VERSION : process.env.VERSION) +'.hex', firmwareMeta)
 .then((flashed) => {

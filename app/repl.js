@@ -1,14 +1,20 @@
 #!/usr/bin/env node
 
-const firmata = require("./lib/firmata");
+const gi = require('node-gtk');
+Fin = gi.require('Fin', '0.2');
+const fin = new Fin.Client();
+const BALENA_FIN_REVISION = fin.revision;
+const firmata = require("firmata");
 const repl = require("repl");
-console.log("Enter USB Port and press enter:");
-process.stdin.resume();
-process.stdin.setEncoding("utf8");
-process.stdin.once("data", (chunk) => {
-  const port = chunk.replace("\n", "");
-  const board = new firmata.Board(port, () => {
+
+let port;
+if (BALENA_FIN_REVISION === '09') {
+  port = process.env.SERIALPORT || "/dev/ttyUSB0";
+} else {
+  port = process.env.SERIALPORT || "/dev/ttyS0";
+}
+
+const board = new firmata.Board('/', () => {
     console.log(`Successfully Connected to ${port}`);
     repl.start("firmata>").context.board = board;
-  });
 });

@@ -44,16 +44,6 @@ let getFirmware = function() {
   });
 };
 
-const setEnv = (key, val) => {
-	console.log(`setting ${key} to ${val}...`);
-	sdk.models.device.envVar.set(BALENA_DEVICE_UUID, key, val);
-};
-
-const removeEnv = (key) => {
-  console.log(`removing tag ${key}`);
-	sdk.models.device.envVar.set(BALENA_DEVICE_UUID, key);
-};
-
 const setTag = (key, val) => {
 	console.log(`setting ${key} to ${val}...`);
 	sdk.models.device.tags.set(BALENA_DEVICE_UUID, key, val);
@@ -61,7 +51,9 @@ const setTag = (key, val) => {
 
 const removeTag = (key) => {
   console.log(`removing tag ${key}`);
-  sdk.models.device.tags.remove(BALENA_DEVICE_UUID, key);
+  sdk.models.device.tags.remove(BALENA_DEVICE_UUID, key, function(error) {
+    if (error) console.log(`INFO: Could not remove tag ${key}.`);
+});
 }
 
 const shutdown = (delay, timeout) => {
@@ -195,11 +187,8 @@ process.on('SIGINT', () => {
   process.exit();
 });
 
-// getFirmware().then((data) => { 
-//   setTag('copro-firmware', data.implementationVersion);
-// });
-// setTag('cm-power', 'awake');
-// removeTag('time-until-awake');
+setTag('cm-power', 'awake');
+removeTag('time-until-awake');
 
 firmata.queryFirmware()
 .then((data)=>{
@@ -215,33 +204,7 @@ firmata.queryFirmware()
     if (!flashed) {
       console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
     }
-    if(!process.env.FIRMATA_NAME & !process.env.FIRMATA_VERSION){
-      setEnv('FIRMATA_VERSION',firmwareMeta.version);
-    }
     setTag('copro-firmata', firmwareMeta.version);
   })
   .catch(console.error);
 });
-
-// if (!process.env.FIRMWARE) {
-//   const firmwareFile = process.env.FLASH_ON_START_FILE;
-//   const firmwareMeta = {
-//     name: 'firmata.hex',
-//     version: '2.0.1',
-//   };
-
-//     if (firmwareMeta.name && firmwareMeta.version) {
-//       console.log(`Automatic flashing is configured using ${firmwareFile}.`);
-//       flasher.flashIfNeeded(firmwareFile, firmwareMeta)
-//           .then((flashed) => {
-//             if (!flashed) {
-//               console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
-//             }
-//             setEnv('FIRMATA_NAME',firmwareMeta.name);
-//             setEnv('FIRMATA_VERSION',firmwareMeta.version);
-//           })
-//           .catch(console.error);
-//     } else {
-//       console.log('Bad automatic flash configuration: firmware meta data is not fully provided');
-//     }
-// }

@@ -11,6 +11,9 @@ COPY ./app/package.json package.json
 COPY ./app/package-lock.json package-lock.json
 RUN JOBS=MAX npm install --unsafe-perm --production && npm cache clean --force
 
+# Install Firmata REPL
+RUN npm install -g firmata
+
 ## target base image
 FROM balenalib/fincm3-node:${NODEJS_VERSION}-run
 ENV BALENA_OPENOCD_VERSION 0.1.1

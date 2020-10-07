@@ -204,8 +204,8 @@ process.on('SIGINT', () => {
 firmata.queryFirmware()
 .then((data)=>{
   console.log(`${data.firmataName} @ ${data.implementationVersion}`)
-  if(process.env.FIRMATA_NAME & process.env.FIRMATA_VERSION){
-    firmwareMeta = {name: process.env.FIRMATA_NAME, version: process.env.FIRMATA_VERSION};
+  if(process.env.FIRMATA_VERSION){
+    firmwareMeta = {name: 'StandardFirmata', version: process.env.FIRMATA_VERSION};
   };
 })
 .catch(console.error)
@@ -216,7 +216,6 @@ firmata.queryFirmware()
       console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
     }
     if(!process.env.FIRMATA_NAME & !process.env.FIRMATA_VERSION){
-      setEnv('FIRMATA_NAME',firmwareMeta.name);
       setEnv('FIRMATA_VERSION',firmwareMeta.version);
     }
     setTag('copro-firmata', firmwareMeta.version);

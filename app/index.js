@@ -57,26 +57,24 @@ const setEnv = (key, val) => {
 };
 
 const setTag = (key, val) => {
-	console.log(`setting tag ${key} to ${val}...`);
-	sdk.models.device.tags.set(BALENA_DEVICE_UUID, key, val);
+  return new Promise((resolve, reject) => {
+    console.log(`setting ${key} to ${val}...`);
+    sdk.models.device.tags.set(BALENA_DEVICE_UUID, key, val);
+    resolve();
+  });
 };
-
-const removeTag = (key) => {
-  console.log(`removing tag ${key}`);
-  sdk.models.device.tags.remove(BALENA_DEVICE_UUID, key, function(error) {
-    if (error) console.log(`INFO: Could not remove tag ${key}.`);
-});
-}
 
 const shutdown = (delay, timeout) => {
   return supervisor.checkForOngoingUpdate()
       .then(() => {
-        firmata.sleep(parseInt(delay), parseInt(timeout));
-        setTag('cm-power', 'sleeping');
-        var parsedDate = new Date()
-        var newDate = new Date(parsedDate.getTime() + (1000 * seconds))
-        setTag('time-until-awake', dateFormat(newDate, "isoDateTime"))
-        return supervisor.shutdown();
+        setTag('fin-status', 'sleeping').then(() => {
+          var parsedDate = new Date()
+          var newDate = new Date(parsedDate.getTime() + (1000 * timeout))
+          setTag('time-until-awake', dateFormat(newDate, "isoDateTime")).then(() => {
+            firmata.sleep(parseInt(delay), parseInt(timeout));
+            return supervisor.shutdown();
+          });
+        });
       })
       .catch(() => { throw new Error('Device is not Idle, likely updating, will not shutdown'); });
 };
@@ -199,15 +197,16 @@ process.on('SIGINT', () => {
   process.exit();
 });
 
-setTag('cm-power', 'awake');
-
-
-
+setTag('fin-status', 'awake');
+setTag('time-until-awake', 'N/A');
 
 flasher.flashIfNeeded('firmata-' + ((process.env.FIRMATA_VERSION) ? process.env.FIRMATA_VERSION : process.env.VERSION) +'.hex', firmwareMeta)
 .then((flashed) => {
   if (!flashed) {
     console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
+  }
+  else {
+    setTag('fin-status', 'flashing');
   }
 })
 .then(() => {

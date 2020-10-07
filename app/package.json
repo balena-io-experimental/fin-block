@@ -36,18 +36,19 @@
   },
   "homepage": "https://github.com/balena-io-playground/balena-fin-firmata-flash#readme",
   "dependencies": {
+    "balena-sdk": "^12.30.0",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
+    "dateformat": "^3.0.3",
     "debug": "^4.1.1",
     "express": "^4.17.1",
     "firmata": "^2.2.0",
+    "lodash": "^4.17.15",
     "node-gtk": "^0.4.0",
     "onoff": "^6.0.0",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.8",
-    "serialport": "^9.0.0",
-    "balena-sdk": "^12.30.0",
-    "lodash": "^4.17.15",
-    "dateformat": "^3.0.3"
+    "semver-compare": "^1.0.0",
+    "serialport": "^9.0.0"
   }
 }

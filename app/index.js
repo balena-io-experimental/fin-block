@@ -219,7 +219,7 @@ firmata.queryFirmware()
       setEnv('FIRMATA_NAME',firmwareMeta.name);
       setEnv('FIRMATA_VERSION',firmwareMeta.version);
     }
-    setTag('copro-firmware', data.implementationVersion);
+    setTag('copro-firmata', firmwareMeta.version);
   })
   .catch(console.error);
 });

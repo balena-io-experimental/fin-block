@@ -1,6 +1,7 @@
 const Gpio = require('onoff').Gpio;
 const mux = new Gpio(41, 'out');
 const { spawn } = require("child_process");
+const cmp = require('semver-compare');
 const fs = require('fs');
 
 let flashingInProgress = false;
@@ -80,7 +81,8 @@ function newFlasher(finRevision, supervisor, firmata) {
             return { firmataName: '', firmataVersion: '' };
           })
           .then(({ firmataName: currentName, implementationVersion: currentImplVersion }) => {
-            if (currentName !== meta.name || currentImplVersion !== meta.version) {
+            if ((currentName === '') || ((cmp(currentImplVersion.substr(1),meta.version.substr(1)) === -1) && (currentName === meta.name))){
+            // if (currentName !== meta.name || currentImplVersion !== meta.version) {
               console.log(`Start automatic flashing: updating from [${currentName}/${currentImplVersion}]`);
               return this.flash(filePath).then(() => true);
             }

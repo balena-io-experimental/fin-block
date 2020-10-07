@@ -45,6 +45,9 @@
     "onoff": "^6.0.0",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.8",
-    "serialport": "^9.0.0"
+    "serialport": "^9.0.0",
+    "balena-sdk": "^12.30.0",
+    "lodash": "^4.17.15",
+    "dateformat": "^3.0.3"
   }
 }

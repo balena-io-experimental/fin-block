@@ -3,7 +3,7 @@
 const express = require('express');
 const compression = require('compression');
 const bodyParser = require('body-parser');
-const dateformat = require('dateformat');
+const dateFormat = require('dateformat');
 
 const gi = require('node-gtk');
 const Fin = gi.require('Fin', '0.2');
@@ -63,7 +63,7 @@ const shutdown = (delay, timeout) => {
         setTag('fin-status', 'sleeping').then(() => {
           var parsedDate = new Date()
           var newDate = new Date(parsedDate.getTime() + (1000 * timeout))
-          setTag('time-until-awake', dateFormat(newDate, "isoDateTime")).then(() => {
+          setTag('wake-eta', dateFormat(newDate, "isoDateTime")).then(() => {
             firmata.sleep(parseInt(delay), parseInt(timeout));
             return supervisor.shutdown();
           });
@@ -191,11 +191,11 @@ process.on('SIGINT', () => {
 });
 
 setTag('fin-status', 'awake');
-setTag('time-until-awake', 'N/A');
+setTag('wake-eta', 'N/A');
 
 firmata.queryFirmware()
 .then((data)=>{
-  setTag('copro-firmata', data.implementationVersion);
+  setTag('firmata', data.implementationVersion);
   console.log(`${data.firmataName} @ ${data.implementationVersion}`)
   if(process.env.FIRMATA_VERSION){
     firmwareMeta = {name: 'StandardFirmata', version: process.env.FIRMATA_VERSION};

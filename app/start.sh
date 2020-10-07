@@ -18,4 +18,4 @@ if [[ ! -z $FW_VERSION ]]
         fi
 fi
 
-#node index.js
+node index.js

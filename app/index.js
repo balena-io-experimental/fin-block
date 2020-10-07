@@ -3,12 +3,19 @@
 const express = require('express');
 const compression = require('compression');
 const bodyParser = require('body-parser');
-const dateFormat = require('dateformat');
+const dateformat = require('dateformat');
+const SerialPort = require('serialport');
 
 const gi = require('node-gtk');
 const Fin = gi.require('Fin', '0.2');
 const fin = new Fin.Client();
 const BALENA_FIN_REVISION = fin.revision;
+let port;
+if (BALENA_FIN_REVISION === '09') {
+  port = process.env.SERIALPORT || "/dev/ttyUSB0";
+} else {
+  port = process.env.SERIALPORT || "/dev/ttyS0";
+}
 const SERVER_PORT = parseInt(process.env.SERVER_PORT) || 1337;
 
 const firmata = require(__dirname + '/utils/firmata.js');
@@ -35,17 +42,17 @@ let getFirmware = function() {
   return new Promise((resolve, reject) => {
       firmata.queryFirmware()
       .then((data) => {
-        console.log(`returning firmware version ${data}`);
+        console.log(`returning firmware version ${data.implementationVersion}`);
         resolve(data);
       })
-      .catch((data) => {
-        reject(data)
+      .catch(() => {
+        reject('failed to return firmware version, likely failed flashing.');
       })
   });
 };
 
 const setEnv = (key, val) => {
-	console.log(`setting ${key} to ${val}...`);
+	console.log(`setting envar ${key} to ${val}...`);
 	sdk.models.device.envVar.set(BALENA_DEVICE_UUID, key, val);
 };
 
@@ -193,27 +200,23 @@ process.on('SIGINT', () => {
 setTag('fin-status', 'awake');
 setTag('wake-eta', 'N/A');
 
-firmata.queryFirmware()
-.then((data)=>{
-  setTag('firmata', data.implementationVersion);
-  console.log(`${data.firmataName} @ ${data.implementationVersion}`)
-  if(process.env.FIRMATA_VERSION){
-    firmwareMeta = {name: 'StandardFirmata', version: process.env.FIRMATA_VERSION};
+flasher.flashIfNeeded('firmata-' + ((process.env.FIRMATA_VERSION) ? process.env.FIRMATA_VERSION : process.env.VERSION) +'.hex', firmwareMeta)
+.then((flashed) => {
+  if (!flashed) {
+    console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
   }
-  else if (data.firmataName !== '' || data.implementationVersion !== '') {
-    // setTag('copro-firmata', firmwareMeta.version);
-  };
+  else {
+    setTag('fin-status', 'flashing');
+  }
 })
-.catch(console.error)
 .then(() => {
-  // console.log(`flashing ${firmwareMeta.version}`)
-  setTag('fin-status', 'flashing');
-  flasher.flashIfNeeded(`firmata-${firmwareMeta.version}.hex`, firmwareMeta)
-  .then((flashed) => {
-    if (!flashed) {
-      console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
-      setTag('fin-status', 'awake');
-    }
+  getFirmware()
+  .then((data) => {
+    setTag('firmata', data.implementationVersion);
   })
-  .catch(console.error);
-});
+  .catch((err) => {
+    console.log(err)
+  })
+}
+)
+.catch(console.error);

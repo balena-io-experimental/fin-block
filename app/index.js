@@ -206,6 +206,10 @@ firmata.queryFirmware()
   console.log(`${data.firmataName} @ ${data.implementationVersion}`)
   if(process.env.FIRMATA_VERSION){
     firmwareMeta = {name: 'StandardFirmata', version: process.env.FIRMATA_VERSION};
+  }
+  else if (data.firmataName !== '' || data.implementationVersion !== '') {
+    setEnv('FIRMATA_VERSION',firmwareMeta.version);
+    setTag('copro-firmata', firmwareMeta.version);
   };
 })
 .catch(console.error)
@@ -215,33 +219,7 @@ firmata.queryFirmware()
     if (!flashed) {
       console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
     }
-    if(!process.env.FIRMATA_NAME & !process.env.FIRMATA_VERSION){
-      setEnv('FIRMATA_VERSION',firmwareMeta.version);
-    }
-    setTag('copro-firmata', firmwareMeta.version);
+
   })
   .catch(console.error);
 });
-
-// if (!process.env.FIRMWARE) {
-//   const firmwareFile = process.env.FLASH_ON_START_FILE;
-//   const firmwareMeta = {
-//     name: 'firmata.hex',
-//     version: '2.0.1',
-//   };
-
-//     if (firmwareMeta.name && firmwareMeta.version) {
-//       console.log(`Automatic flashing is configured using ${firmwareFile}.`);
-//       flasher.flashIfNeeded(firmwareFile, firmwareMeta)
-//           .then((flashed) => {
-//             if (!flashed) {
-//               console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
-//             }
-//             setEnv('FIRMATA_NAME',firmwareMeta.name);
-//             setEnv('FIRMATA_VERSION',firmwareMeta.version);
-//           })
-//           .catch(console.error);
-//     } else {
-//       console.log('Bad automatic flash configuration: firmware meta data is not fully provided');
-//     }
-// }

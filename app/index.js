@@ -210,7 +210,7 @@ firmata.queryFirmware()
 })
 .catch(console.error)
 .then(() => {
-  flasher.flashIfNeeded('firmata.hex', firmwareMeta)
+  flasher.flashIfNeeded(`firmata-${firmwareMeta.version}.hex`, firmwareMeta)
   .then((flashed) => {
     if (!flashed) {
       console.log('Automatic flashing is skipped: the requested firmware is already flashed.');

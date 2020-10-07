@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 
-PATH=/usr/src/app/firmware/firmata-
+FW_PATH=/usr/src/app/firmware/firmata-
 RELEASE_PATH=https://github.com/balena-io/balena-fin-coprocessor-firmata/releases/download/
 
 if [[ ! -z $FIRMATA_VERSION ]]
     then
-        FILEPATH="${PATH}${FIRMATA_VERSION}"
+        FILEPATH="${FW_PATH}${FIRMATA_VERSION}.hex"
         if test -f $FILEPATH
             then
                 echo "Firmware already downloaded. Skipping."
@@ -18,4 +18,9 @@ if [[ ! -z $FIRMATA_VERSION ]]
         fi
 fi
 
-node index.js
+# if [[ ! -z $FIRMATA_REPL ]]
+#     then
+        node index.js
+#     else
+#         firmata
+# fi

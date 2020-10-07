@@ -12,6 +12,7 @@ const SERVER_PORT = parseInt(process.env.SERVER_PORT) || 1337;
 
 const firmata = require(__dirname + '/utils/firmata.js');
 const supervisor = require(__dirname + '/utils/supervisor.js');
+const api = require(__dirname + '/utils/api.js')
 const Flasher = require(__dirname + '/flasher.js');
 
 const app = express();
@@ -24,6 +25,17 @@ const shutdown = (delay, timeout) => {
         return supervisor.shutdown();
       })
       .catch(() => { throw new Error('Device is not Idle, likely updating, will not shutdown'); });
+};
+
+let getPin = function(pin) {
+  return new Promise((resolve, reject) => {
+    supervisor.checkForOngoingUpdate().then((response) => {
+      firmata.getPin(parseInt(pin));
+      resolve();
+    }).catch((response) => {
+      reject("coprocessor is not responding...");
+    });
+  });
 };
 
 let setPin = function(pin,state) {
@@ -65,14 +77,30 @@ app.post('/v1/flash/:fw', (req, res) => {
   return flasher.flash(req.params.fw)
       .then(() => {
         return res.status(200).send('OK');
+      })
+      .catch((err) => {
+        return res.status(400).send(err.message);
       });
 });
 
-app.post('/v1/setpin/:pin/:state', (req, res) => {
+app.post('/v1/pin/get/:pin', (req, res) => {
+  if (!req.params.pin) {
+    return res.status(400).send('Bad Request');
+  }
+  console.log('get pin ' + req.params.pin + ' state');
+  getPin(req.params.pin, req.params.state).then((data)=> {
+    res.status(200).send(data);
+  }).catch((error) => {
+    console.error("device is not responding, check for on-going coprocessor flashing/application updating.");  
+    res.status(400);
+  });
+});
+
+app.post('/v1/pin/set/:pin/:state', (req, res) => {
   if (!req.params.pin || !req.params.state) {
     return res.status(400).send('Bad Request');
   }
-  console.log('set ' + req.params.pin + ' to state ' + req.params.state);
+  console.log('set pin ' + req.params.pin + ' to state ' + req.params.state);
   setPin(req.params.pin, req.params.state).then(()=> {
     res.status(200).send('OK');
   }).catch((error) => {
@@ -100,9 +128,11 @@ app.post('/v1/sleep/:delay/:timeout', (req, res) => {
 
 app.get('/v1/firmware', (req, res) => {
   firmata.queryFirmware().then((data) => {
-    res.send(data)
-  });
-    
+    return res.status(200).send(data)
+  })
+  .catch((error) => {
+    return res.status(405).send('Firmata is unreachable.');
+  })    
 });
 
 app.listen(SERVER_PORT, () => {
@@ -115,23 +145,34 @@ process.on('SIGINT', () => {
   process.exit();
 });
 
-if (process.env.FLASH_ON_START_FILE) {
+if (!process.env.FIRMWARE) {
+  console.log('Missing firmware')
   const firmwareFile = process.env.FLASH_ON_START_FILE;
   const firmwareMeta = {
     name: process.env.FLASH_ON_START_NAME,
     version: process.env.FLASH_ON_START_VERSION,
   };
 
-  if (firmwareMeta.name && firmwareMeta.version) {
-    console.log(`Automatic flashing is configured using ${firmwareFile}.`);
-    flasher.flashIfNeeded(firmwareFile, firmwareMeta)
-        .then((flashed) => {
-          if (!flashed) {
-            console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
-          }
-        })
-        .catch(console.error);
-  } else {
-    console.log('Bad automatic flash configuration: firmware meta data is not fully provided');
-  }
+  api.getDevice().then((response) =>{
+    console.log(response)
+  })
+
+  // return api.setFirmwareEnv('firmata')
+  // .then(() => {
+  //   if (firmwareMeta.name && firmwareMeta.version) {
+  //     console.log(`Automatic flashing is configured using ${firmwareFile}.`);
+  //     flasher.flashIfNeeded(firmwareFile, firmwareMeta)
+  //         .then((flashed) => {
+  //           if (!flashed) {
+  //             console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
+  //           }
+  //         })
+  //         .catch(console.error);
+  //   } else {
+  //     console.log('Bad automatic flash configuration: firmware meta data is not fully provided');
+  //   }
+  // })
+  // .catch((err) => {
+
+  // });
 }

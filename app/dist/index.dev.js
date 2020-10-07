@@ -9,12 +9,22 @@ var bodyParser = require('body-parser');
 
 var dateformat = require('dateformat');
 
+var SerialPort = require('serialport');
+
 var gi = require('node-gtk');
 
 var Fin = gi.require('Fin', '0.2');
 
 var fin = new Fin.Client();
 var BALENA_FIN_REVISION = fin.revision;
+var port;
+
+if (BALENA_FIN_REVISION === '09') {
+  port = process.env.SERIALPORT || "/dev/ttyUSB0";
+} else {
+  port = process.env.SERIALPORT || "/dev/ttyS0";
+}
+
 var SERVER_PORT = parseInt(process.env.SERVER_PORT) || 1337;
 
 var firmata = require(__dirname + '/utils/firmata.js');
@@ -42,35 +52,38 @@ var firmwareMeta = {
 
 var getFirmware = function getFirmware() {
   return new Promise(function (resolve, reject) {
-    var data = firmata.queryFirmware().then(function () {
-      console.log("returning firmware version ".concat(data));
+    firmata.queryFirmware().then(function (data) {
+      console.log("returning firmware version ".concat(data.implementationVersion));
       resolve(data);
     })["catch"](function () {
-      reject(data);
+      reject('failed to return firmware version, likely failed flashing.');
     });
   });
 };
 
-var setTag = function setTag(key, val) {
-  console.log("setting ".concat(key, " to ").concat(val, "..."));
-  sdk.models.device.tags.set(BALENA_DEVICE_UUID, key, val);
+var setEnv = function setEnv(key, val) {
+  console.log("setting envar ".concat(key, " to ").concat(val, "..."));
+  sdk.models.device.envVar.set(BALENA_DEVICE_UUID, key, val);
 };
 
-var removeTag = function removeTag(key) {
-  console.log("removing tag ".concat(key));
-  sdk.models.device.tags.remove(BALENA_DEVICE_UUID, key, function (error) {
-    if (error) console.log("INFO: Could not remove tag ".concat(key, "."));
+var setTag = function setTag(key, val) {
+  return new Promise(function (resolve, reject) {
+    console.log("setting ".concat(key, " to ").concat(val, "..."));
+    sdk.models.device.tags.set(BALENA_DEVICE_UUID, key, val);
+    resolve();
   });
 };
 
 var shutdown = function shutdown(delay, timeout) {
   return supervisor.checkForOngoingUpdate().then(function () {
-    firmata.sleep(parseInt(delay), parseInt(timeout));
-    setTag('cm-power', 'sleeping');
-    var parsedDate = new Date();
-    var newDate = new Date(parsedDate.getTime() + 1000 * seconds);
-    setTag('time-until-awake', dateFormat(newDate, "isoDateTime"));
-    return supervisor.shutdown();
+    setTag('fin-status', 'sleeping').then(function () {
+      var parsedDate = new Date();
+      var newDate = new Date(parsedDate.getTime() + 1000 * timeout);
+      setTag('time-until-awake', dateFormat(newDate, "isoDateTime")).then(function () {
+        firmata.sleep(parseInt(delay), parseInt(timeout));
+        return supervisor.shutdown();
+      });
+    });
   })["catch"](function () {
     throw new Error('Device is not Idle, likely updating, will not shutdown');
   });
@@ -185,28 +198,18 @@ process.on('SIGINT', function () {
   flasher.stop();
   process.exit();
 });
-setTag('cm-power', 'awake'); // removeTag('time-until-awake');
-
-firmata.queryFirmware().then(function (data) {
-  console.log("".concat(data.firmataName, " @ ").concat(data.implementationVersion));
-
-  if (process.env.FIRMATA_VERSION) {
-    firmwareMeta = {
-      name: 'StandardFirmata',
-      version: process.env.FIRMATA_VERSION
-    };
-  } else if (data.firmataName !== '' || data.implementationVersion !== '') {
-    setEnv('FIRMATA_VERSION', firmwareMeta.version);
-    setTag('copro-firmata', firmwareMeta.version);
+setTag('fin-status', 'awake');
+setTag('time-until-awake', 'N/A');
+flasher.flashIfNeeded('firmata-' + (process.env.FIRMATA_VERSION ? process.env.FIRMATA_VERSION : process.env.VERSION) + '.hex', firmwareMeta).then(function (flashed) {
+  if (!flashed) {
+    console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
+  } else {
+    setTag('fin-status', 'flashing');
   }
-
-  ;
-})["catch"](console.error).then(function () {
-  console.log("flashing ".concat(firmwareMeta.version)); // flasher.flashIfNeeded(`firmata-${firmwareMeta.version}.hex`, firmwareMeta)
-  // .then((flashed) => {
-  //   if (!flashed) {
-  //     console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
-  //   }
-  // })
-  // .catch(console.error);
-});
+}).then(function () {
+  getFirmware().then(function (data) {
+    setTag('firmata', data.implementationVersion);
+  })["catch"](function (err) {
+    console.log(err);
+  });
+})["catch"](console.error);

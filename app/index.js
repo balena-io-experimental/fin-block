@@ -212,8 +212,7 @@ flasher.flashIfNeeded('firmata-' + ((process.env.FIRMATA_VERSION) ? process.env.
 .then(() => {
   getFirmware()
   .then((data) => {
-    setEnv('FIRMATA_VERSION',data.implementationVersion);
-    setTag('copro-firmata', data.implementationVersion);
+    setTag('firmata', data.implementationVersion);
   })
   .catch((err) => {
     console.log(err)

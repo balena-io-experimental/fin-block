@@ -3,9 +3,7 @@
 const express = require('express');
 const compression = require('compression');
 const bodyParser = require('body-parser');
-const dateformat = require('dateformat');
-const SerialPort = require('serialport');
-
+const dateFormat = require('dateformat');
 const gi = require('node-gtk');
 const Fin = gi.require('Fin', '0.2');
 const fin = new Fin.Client();
@@ -29,11 +27,9 @@ const balena = require('balena-sdk');
 
 const sdk = balena.fromSharedOptions();
 let token = process.env.BALENA_API_KEY || "";
-console.log(`Using token ${token}`);
 sdk.auth.loginWithToken(token);
 
 let uuid = process.env.BALENA_DEVICE_UUID || "";
-console.log(`Using UUID ${uuid}`);
 const BALENA_DEVICE_UUID = uuid;
 
 let firmwareMeta = {name:'StandardFirmata',version:'v2.0.1'};
@@ -49,11 +45,6 @@ let getFirmware = function() {
         reject('failed to return firmware version, likely failed flashing.');
       })
   });
-};
-
-const setEnv = (key, val) => {
-	console.log(`setting envar ${key} to ${val}...`);
-	sdk.models.device.envVar.set(BALENA_DEVICE_UUID, key, val);
 };
 
 const setTag = (key, val) => {
@@ -200,7 +191,7 @@ process.on('SIGINT', () => {
 setTag('fin-status', 'awake');
 setTag('wake-eta', 'N/A');
 
-flasher.flashIfNeeded('firmata-' + ((process.env.FIRMATA_VERSION) ? process.env.FIRMATA_VERSION : process.env.VERSION) +'.hex', firmwareMeta)
+flasher.flashIfNeeded('firmata-v' + ((process.env.FIRMATA_VERSION) ? process.env.FIRMATA_VERSION : process.env.DEFAULT_VERSION) +'.hex', firmwareMeta)
 .then((flashed) => {
   if (!flashed) {
     console.log('Automatic flashing is skipped: the requested firmware is already flashed.');

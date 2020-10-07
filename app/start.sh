@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 VERSION=2.0.1
+FIRMATA_VERSION=2.0.1
 FIRMWARE_PATH=./firmware/firmata-
 RELEASE_PATH=https://github.com/balena-io/balena-fin-coprocessor-firmata/releases/download/
 
@@ -20,9 +21,4 @@ if test -f $FILEPATH
         curl ${FULL_PATH} -L -o "${FILEPATH}"
 fi
 
-if [[ ! -z $FIRMATA_REPL ]]
-    then
-        node repl.js
-    else
-        node index.js
-fi
+node index.js

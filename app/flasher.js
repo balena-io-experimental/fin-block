@@ -3,7 +3,6 @@ const mux = new Gpio(41, 'out');
 const { spawn } = require("child_process");
 const cmp = require('semver-compare');
 const fs = require('fs');
-const ser = require('serialport');
 
 let flashingInProgress = false;
 
@@ -66,6 +65,13 @@ function newFlasher(finRevision, supervisor, firmata) {
         if (finRevision > '09') {
           console.log('rebooting via supervisor...');
           // We trigger the reboot, but don't await it.
+          // const flush = spawn("/usr/src/app/flush");
+          // flush.stdout.on('data', (data) => {
+          //   console.log("flush stdout: " + data);
+          // });
+          // flush.on('close', () => {
+          //   console.log('flush complete.')
+          // });
           supervisor.reboot()
               .catch((err) => {
                 console.error('reboot failed with error: ', err);
@@ -79,6 +85,7 @@ function newFlasher(finRevision, supervisor, firmata) {
       return firmata.queryFirmware()
           .catch(() => {
             // We cannot query firmware.
+            console.log('Cannot query firmware')
             return { firmataName: '', firmataVersion: '' };
           })
           .then(({ firmataName: currentName, implementationVersion: currentImplVersion }) => {
@@ -90,7 +97,6 @@ function newFlasher(finRevision, supervisor, firmata) {
             return false;
           });
     },
-
     stop: function () {
       mux.unexport();
     }

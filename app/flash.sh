@@ -25,7 +25,7 @@ case $REV in
     ;;
 esac
 sleep 6
-  { sleep 5; echo "reset halt"; echo "program firmware/bootloader.s37"; sleep 5; echo "reset halt"; echo "program firmware/$FW"; echo "reset run"; sleep 10; echo "exit"; echo -e '\x1dclose\x0d'; } | telnet localhost 4444
+  { sleep 5; echo "reset halt"; echo "program /data/firmware/bootloader.s37"; sleep 5; echo "reset halt"; echo "program /data/firmware/$FW"; echo "reset run"; sleep 10; echo "exit"; echo -e '\x1dclose\x0d'; } | telnet localhost 4444
 sleep 5
 echo -e "flashing complete\n"
 echo "releasing lockfile..."

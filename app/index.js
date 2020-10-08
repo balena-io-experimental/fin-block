@@ -3,11 +3,18 @@
 const express = require('express');
 const compression = require('compression');
 const bodyParser = require('body-parser');
-
+const dateFormat = require('dateformat');
 const gi = require('node-gtk');
+const fs = require('fs');
 const Fin = gi.require('Fin', '0.2');
 const fin = new Fin.Client();
 const BALENA_FIN_REVISION = fin.revision;
+let port;
+if (BALENA_FIN_REVISION === '09') {
+  port = process.env.SERIALPORT || "/dev/ttyUSB0";
+} else {
+  port = process.env.SERIALPORT || "/dev/ttyS0";
+}
 const SERVER_PORT = parseInt(process.env.SERVER_PORT) || 1337;
 
 const firmata = require(__dirname + '/utils/firmata.js');
@@ -17,13 +24,61 @@ const Flasher = require(__dirname + '/flasher.js');
 const app = express();
 const flasher = Flasher(BALENA_FIN_REVISION, supervisor, firmata);
 
+const balena = require('balena-sdk');
+
+const sdk = balena.fromSharedOptions();
+let token = process.env.BALENA_API_KEY || "";
+sdk.auth.loginWithToken(token);
+
+let uuid = process.env.BALENA_DEVICE_UUID || "";
+const BALENA_DEVICE_UUID = uuid;
+
+
+let getFirmware = function() {
+  return new Promise((resolve, reject) => {
+      firmata.queryFirmware()
+      .then((data) => {
+        console.log(`returning firmware version ${data.implementationVersion}`);
+        resolve(data);
+      })
+      .catch(() => {
+        reject('failed to return firmware version, likely failed flashing.');
+      })
+  });
+};
+
+const setTag = (key, val) => {
+  return new Promise((resolve, reject) => {
+    console.log(`setting ${key} to ${val}...`);
+    sdk.models.device.tags.set(BALENA_DEVICE_UUID, key, val);
+    resolve();
+  });
+};
+
 const shutdown = (delay, timeout) => {
   return supervisor.checkForOngoingUpdate()
       .then(() => {
-        firmata.sleep(parseInt(delay), parseInt(timeout));
-        return supervisor.shutdown();
+        setTag('fin-status', 'sleeping').then(() => {
+          var parsedDate = new Date()
+          var newDate = new Date(parsedDate.getTime() + (1000 * timeout))
+          setTag('wake-eta', dateFormat(newDate, "isoDateTime")).then(() => {
+            firmata.sleep(parseInt(delay), parseInt(timeout));
+            return supervisor.shutdown();
+          });
+        });
       })
       .catch(() => { throw new Error('Device is not Idle, likely updating, will not shutdown'); });
+};
+
+let getPin = function(pin) {
+  return new Promise((resolve, reject) => {
+    supervisor.checkForOngoingUpdate().then((response) => {
+      firmata.getPin(parseInt(pin));
+      resolve();
+    }).catch((response) => {
+      reject("coprocessor is not responding...");
+    });
+  });
 };
 
 let setPin = function(pin,state) {
@@ -57,29 +112,31 @@ app.use(function(req, res, next) {
 });
 app.use(errorHandler);
 
-app.post('/v1/flash/:fw', (req, res) => {
-  if (!req.params.fw) {
+app.post('/pin/get/:pin', (req, res) => {
+  if (!req.params.pin) {
     return res.status(400).send('Bad Request');
   }
-
-  return flasher.flash(req.params.fw)
-      .then(() => {
-        return res.status(200).send('OK');
-      });
+  console.log('get pin ' + req.params.pin + ' state');
+  getPin(req.params.pin, req.params.state).then((data)=> {
+    res.status(200).send(data);
+  }).catch((error) => {
+    console.error("device is not responding, check for on-going coprocessor flashing/application updating.");  
+    res.status(400);
+  });
 });
 
-app.post('/v1/setpin/:pin/:state', (req, res) => {
+app.post('/pin/set/:pin/:state', (req, res) => {
   if (!req.params.pin || !req.params.state) {
     return res.status(400).send('Bad Request');
   }
-  console.log('set ' + req.params.pin + ' to state ' + req.params.state);
+  console.log('set pin ' + req.params.pin + ' to state ' + req.params.state);
   setPin(req.params.pin, req.params.state).then(()=> {
     res.status(200).send('OK');
   }).catch((error) => {
     console.error("device is not responding, check for on-going coprocessor flashing/application updating.");  });
 });
 
-app.post('/v1/sleep/:delay/:timeout', (req, res) => {
+app.post('/sleep/:delay/:timeout', (req, res) => {
   if (!req.params.delay || !req.params.timeout) {
     return res.status(400).send('Bad Request');
   }
@@ -98,11 +155,13 @@ app.post('/v1/sleep/:delay/:timeout', (req, res) => {
       });
 });
 
-app.get('/v1/firmware', (req, res) => {
-  firmata.queryFirmware().then((data) => {
-    res.send(data)
-  });
-    
+app.get('/firmware', (req, res) => {
+  getFirmware().then((data) => {
+    return res.status(200).send(data.implementationVersion)
+  })
+  .catch((error) => {
+    return res.status(405).send('Firmata is unreachable.');
+  })    
 });
 
 app.listen(SERVER_PORT, () => {
@@ -115,23 +174,43 @@ process.on('SIGINT', () => {
   process.exit();
 });
 
-if (process.env.FLASH_ON_START_FILE) {
-  const firmwareFile = process.env.FLASH_ON_START_FILE;
-  const firmwareMeta = {
-    name: process.env.FLASH_ON_START_NAME,
-    version: process.env.FLASH_ON_START_VERSION,
-  };
+setTag('fin-status', 'awake');
+setTag('wake-eta', 'N/A');
 
-  if (firmwareMeta.name && firmwareMeta.version) {
-    console.log(`Automatic flashing is configured using ${firmwareFile}.`);
-    flasher.flashIfNeeded(firmwareFile, firmwareMeta)
-        .then((flashed) => {
-          if (!flashed) {
-            console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
-          }
-        })
-        .catch(console.error);
-  } else {
-    console.log('Bad automatic flash configuration: firmware meta data is not fully provided');
-  }
+if(process.env.DEV_MODE){
+  let fsTimeout;
+
+  fs.watch('firmware/', function (event, filename) {
+    if (!fsTimeout) {
+        if (filename.includes(".hex") && fs.existsSync(`firmware/${filename}`)) {
+            flasher.flash(filename)
+            .then(console.log('Rebooting now...'))
+            .catch((err) => {console.log(err)})
+        }
+        fsTimeout = setTimeout(function() { fsTimeout=null }, 1000) // give 1 second for multiple events
+    }
+  });
 }
+else {
+  flasher.flashIfNeeded('firmata-' + (process.env.SELECTED_VERSION) +'.hex', {name:'StandardFirmata',version: process.env.SELECTED_VERSION})
+  .then((flashed) => {
+    if (!flashed) {
+      console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
+    }
+    else {
+      setTag('fin-status', 'flashing');
+    }
+  })
+  .then(() => {
+    getFirmware()
+    .then((data) => {
+      setTag('firmata', data.implementationVersion);
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+  }
+  )
+  .catch(console.error);
+}
+

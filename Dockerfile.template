@@ -1,5 +1,13 @@
 ARG NODEJS_VERSION="12"
 
+FROM balenalib/raspberrypi3-debian:stretch AS essentialsstep
+RUN install_packages \
+    build-essential
+
+WORKDIR /usr/src/bin
+COPY ./bin/flush.c .
+RUN gcc flush.c -o /usr/src/bin/flush
+
 ## buildstep base image
 FROM balenalib/fincm3-node:${NODEJS_VERSION}-build AS buildstep
 # install required packages
@@ -19,6 +27,7 @@ ENV BALENA_FIN_SDK_VERSION 0.2.0
 WORKDIR /usr/src/app
 # gather compiled node modules from buildstep
 COPY --from=buildstep /usr/src/app/node_modules node_modules
+COPY --from=essentialsstep /usr/src/bin/flush flush
 
 # install required packages
 RUN install_packages \

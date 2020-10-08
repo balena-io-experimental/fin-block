@@ -10,7 +10,7 @@ function newFlasher(finRevision, supervisor, firmata) {
   return {
     flash: function (name) {
       return new Promise((resolve, reject) => {
-        fs.access(`firmware/${name}`, fs.F_OK, (err) =>{
+        fs.access(`/data/firmware/${name}`, fs.F_OK, (err) =>{
           if(err){
             reject(new Error(`Firmware ${name} not found`));
             return; 

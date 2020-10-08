@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 export DEFAULT_VERSION=2.0.1
-FIRMWARE_PATH=./firmware/firmata-
+FIRMWARE_PATH=/data/firmware/firmata-
 RELEASE_PATH=https://github.com/balena-io/balena-fin-coprocessor-firmata/releases/download/
 
 if [[ "$FIRMATA_VERSION" == "latest" ]];

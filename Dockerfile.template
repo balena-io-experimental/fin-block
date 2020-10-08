@@ -49,7 +49,7 @@ RUN curl -Ls https://github.com/balena-io/balena-fin-sdk/releases/download/v${BA
 
 # Move app to filesystem
 COPY ./app ./
-RUN chmod +x flash.sh && chmod +x ./openocd/openocd-v1.0.sh && chmod +x ./openocd/openocd-v1.1.sh
+RUN chmod +x flash.sh && chmod +x flush && chmod +x ./openocd/openocd-v1.0.sh && chmod +x ./openocd/openocd-v1.1.sh
 
 # Start app
 CMD ["bash", "/usr/src/app/start.sh"]

@@ -29,16 +29,16 @@ int main()
 		exit(2);
 	}
 
-	printf("Bytes available in the input buffer before flush:%d\n",
-			bytes_available);
+	// printf("Bytes available in the input buffer before flush:%d\n",
+	// 		bytes_available);
 	tcflush(fd, TCIFLUSH);
 	retval = ioctl(fd, FIONREAD, &bytes_available);
 	if (retval < 0) {
 		perror("FIONREAD ioctl failed\n");
 		exit(7);
 	}
-	printf("Bytes available in the input buffer after flush:%d\n",
-			bytes_available);
+	// printf("Bytes available in the input buffer after flush:%d\n",
+	// 		bytes_available);
 	close(fd);
 	return 0;
 }

@@ -6,6 +6,12 @@ REV=$2
 # Makes sure we exit if lock fails.
 set -e
 
+# Flush serial buffer
+if test -f flush ;
+  then
+    ./flush
+fi
+
 echo "acquiring lockfile..."
 exec {lock_fd}>/tmp/balena/updates.lock || exit 1
 flock -n "$lock_fd" || { echo "ERROR: failed to acquire lockfile." >&2; rm -f /tmp/balena/updates.lock; exit 1; }
@@ -32,3 +38,9 @@ echo "releasing lockfile..."
 flock -u "$lock_fd"; rm -f /tmp/balena/updates.lock
 echo "closing the openocd process..."
 kill $(ps aux | grep '[S]CREEN -dmS swd_program' | awk '{print $2}')
+
+# Flush serial buffer
+if test -f flush ;
+  then
+    ./flush
+fi

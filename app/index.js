@@ -191,24 +191,26 @@ if(process.env.DEV_MODE){
     }
   });
 }
-
-flasher.flashIfNeeded('firmata-' + (process.env.SELECTED_VERSION) +'.hex', {name:'StandardFirmata',version: process.env.SELECTED_VERSION})
-.then((flashed) => {
-  if (!flashed) {
-    console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
-  }
-  else {
-    setTag('fin-status', 'flashing');
-  }
-})
-.then(() => {
-  getFirmware()
-  .then((data) => {
-    setTag('firmata', data.implementationVersion);
+else {
+  flasher.flashIfNeeded('firmata-' + (process.env.SELECTED_VERSION) +'.hex', {name:'StandardFirmata',version: process.env.SELECTED_VERSION})
+  .then((flashed) => {
+    if (!flashed) {
+      console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
+    }
+    else {
+      setTag('fin-status', 'flashing');
+    }
   })
-  .catch((err) => {
-    console.log(err)
-  })
+  .then(() => {
+    getFirmware()
+    .then((data) => {
+      setTag('firmata', data.implementationVersion);
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+  }
+  )
+  .catch(console.error);
 }
-)
-.catch(console.error);
+

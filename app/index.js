@@ -150,6 +150,20 @@ app.post('/v1/pin/set/:pin/:state', (req, res) => {
     console.error("device is not responding, check for on-going coprocessor flashing/application updating.");  });
 });
 
+app.post('/v1/firmata/:bool', (req, res) => {
+  if(req.params.bool === 'true'){
+    firmata.open();
+  }
+  else if(req.params.bool === 'false'){
+    firmata.close();
+  }
+  else {
+    return res.status(400).send('Bad Request');
+  }
+  return res.status(200);
+});
+
+
 app.post('/v1/sleep/:delay/:timeout', (req, res) => {
   if (!req.params.delay || !req.params.timeout) {
     return res.status(400).send('Bad Request');

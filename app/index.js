@@ -61,8 +61,8 @@ const addConfigVarsIfNeeded = () => {
         let configNames = []
         let rebootNeeded = new Boolean(false)
         sdk.models.device.configVar.getAllByDevice(uuid).then(function(vars) {
+
         for (i = 0; i < vars.length; i++) {
-          
           configNames.push(vars[i].name);
         }
 
@@ -86,7 +86,6 @@ const addConfigVarsIfNeeded = () => {
         {
           return supervisor.shutdown();
         }
-
       });
     }).catch(() => { throw new Error('Device is not Idle, likely updating, will not add configVars'); });
 }

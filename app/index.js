@@ -5,6 +5,7 @@ const compression = require('compression');
 const bodyParser = require('body-parser');
 const dateFormat = require('dateformat');
 const gi = require('node-gtk');
+const fs = require('fs');
 const Fin = gi.require('Fin', '0.2');
 const fin = new Fin.Client();
 const BALENA_FIN_REVISION = fin.revision;
@@ -175,6 +176,21 @@ process.on('SIGINT', () => {
 
 setTag('fin-status', 'awake');
 setTag('wake-eta', 'N/A');
+
+if(process.env.DEV_MODE){
+  let fsTimeout;
+
+  fs.watch('firmware/', function (event, filename) {
+    if (!fsTimeout) {
+        if (filename.includes(".hex") && fs.existsSync(`firmware/${filename}`)) {
+            flasher.flash(filename)
+            .then(console.log('Rebooting now...'))
+            .catch((err) => {console.log(err)})
+        }
+        fsTimeout = setTimeout(function() { fsTimeout=null }, 1000) // give 1 second for multiple events
+    }
+  });
+}
 
 flasher.flashIfNeeded('firmata-' + (process.env.SELECTED_VERSION) +'.hex', {name:'StandardFirmata',version: process.env.SELECTED_VERSION})
 .then((flashed) => {

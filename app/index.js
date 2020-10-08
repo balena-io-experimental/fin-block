@@ -55,6 +55,42 @@ const setTag = (key, val) => {
   });
 };
 
+const addConfigVarsIfNeeded = () => {
+  return supervisor.checkForOngoingUpdate()
+      .then(() => {
+        let configNames = []
+        let rebootNeeded = new Boolean(false)
+        sdk.models.device.configVar.getAllByDevice(uuid).then(function(vars) {
+        for (i = 0; i < vars.length; i++) {
+          
+          configNames.push(vars[i].name);
+        }
+
+        if (!(configNames.includes('BALENA_HOST_CONFIG_core_freq')))
+        {
+          sdk.models.device.configVar.set(uuid,'BALENA_HOST_CONFIG_core_freq','250').then(function(vars) {
+            rebootNeeded= true;
+            console.log("BALENA_HOST_CONFIG_core_freq added to config vars - reboot needed");
+          });
+        }
+
+        if (!(configNames.includes('BALENA_HOST_CONFIG_dtoverlay')))
+        {
+          sdk.models.device.configVar.set(uuid,'BALENA_HOST_CONFIG_dtoverlay','\"balena-fin\",\"uart1,txd1_pin=32,rxd1_pin=33\"').then(function(vars) {
+            rebootNeeded= true;
+            console.log("BALENA_HOST_CONFIG_dtoverlay added to config vars - reboot needed");
+          });
+        }
+
+        if(rebootNeeded)
+        {
+          return supervisor.shutdown();
+        }
+
+      });
+    }).catch(() => { throw new Error('Device is not Idle, likely updating, will not add configVars'); });
+}
+
 const shutdown = (delay, timeout) => {
   return supervisor.checkForOngoingUpdate()
       .then(() => {
@@ -111,6 +147,20 @@ app.use(function(req, res, next) {
   next();
 });
 app.use(errorHandler);
+
+app.post('/flash/:fw', (req, res) => {
+  if (!req.params.fw) {
+    return res.status(400).send('Bad Request');
+  }
+
+  return flasher.flash(req.params.fw)
+      .then(() => {
+        return res.status(200).send('OK');
+      })
+      .catch((err) => {
+        return res.status(400).send(err.message);
+      });
+});
 
 app.post('/pin/get/:pin', (req, res) => {
   if (!req.params.pin) {
@@ -177,6 +227,8 @@ process.on('SIGINT', () => {
 setTag('fin-status', 'awake');
 setTag('fin-version', (BALENA_FIN_REVISION === '09' ? '1.0.0' : '1.1.0'));
 setTag('wake-eta', 'N/A');
+
+addConfigVarsIfNeeded();
 
 if(process.env.DEV_MODE){
   let fsTimeout;

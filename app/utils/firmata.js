@@ -115,9 +115,6 @@
         debug('Calling queryfirmware');
         board.queryFirmware(() => { });
         return res;
-      })
-      .catch((err) => {
-        console.log(err)
       });
     };
   };

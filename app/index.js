@@ -178,12 +178,13 @@ setTag('fin-status', 'awake');
 setTag('fin-version', (BALENA_FIN_REVISION === '09' ? '1.0.0' : '1.1.0'));
 setTag('wake-eta', 'N/A');
 
-if(process.env.DEV_MODE){
+if(process.env.DEV_MODE == 1){
   let fsTimeout;
+  console.log('Entering Dev Mode.');
 
-  fs.watch('firmware/', function (event, filename) {
+  fs.watch('/data/firmware/', function (event, filename) {
     if (!fsTimeout) {
-        if (filename.includes(".hex") && fs.existsSync(`firmware/${filename}`)) {
+        if (filename.includes(".hex") && fs.existsSync(`/data/firmware/${filename}`)) {
             flasher.flash(filename)
             .then(console.log('Rebooting now...'))
             .catch((err) => {console.log(err)})

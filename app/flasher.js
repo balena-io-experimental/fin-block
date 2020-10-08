@@ -89,16 +89,25 @@ function newFlasher(finRevision, supervisor, firmata) {
             return { firmataName: '', firmataVersion: '' };
           })
           .then(({ firmataName: currentName, implementationVersion: currentImplVersion }) => {
-            if (
-              (process.env.FIRMATA_VERSION != currentImplVersion) || 
-              (currentName == '') || 
-              ((cmp(currentImplVersion.substr(1),meta.version.substr(1)) === -1) && (currentName == meta.name))
-            ){
-            // if (currentName !== meta.name || currentImplVersion !== meta.version) {
-              console.log(`Start automatic flashing: updating from ${currentImplVersion} to ${meta.version}`);
+
+            if(currentName === ''){
+              console.log(`Start automatic flashing: installing firmata ${meta.version}`);
               return this.flash(filePath).then(() => true);
               // return true;
             }
+            else if ((meta.version !== currentImplVersion) && (process.env.SELECTED_VERSION)){
+              console.log(`Start automatic flashing: pinning firmata ${currentImplVersion} (previously ${meta.version})`);
+              return this.flash(filePath).then(() => true);
+              // return true;
+            }
+            else if(currentName !== '' && currentImplVersion !== ''){
+              if(cmp(currentImplVersion.substr(1),meta.version.substr(1)) === -1){
+                console.log(`Start automatic flashing: updating from ${currentImplVersion} to ${meta.version}`);
+                return this.flash(filePath).then(() => true);
+                // return true;
+              }
+            }
+            console.log('Flashing not required.')
             return false;
           });
     },

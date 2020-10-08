@@ -175,6 +175,7 @@ process.on('SIGINT', () => {
 });
 
 setTag('fin-status', 'awake');
+setTag('fin-version', (BALENA_FIN_REVISION === '09' ? '1.0.0' : '1.1.0'));
 setTag('wake-eta', 'N/A');
 
 if(process.env.DEV_MODE){

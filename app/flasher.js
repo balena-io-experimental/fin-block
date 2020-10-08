@@ -89,10 +89,11 @@ function newFlasher(finRevision, supervisor, firmata) {
             return { firmataName: '', firmataVersion: '' };
           })
           .then(({ firmataName: currentName, implementationVersion: currentImplVersion }) => {
-            if ((currentName === '') || ((cmp(currentImplVersion.substr(1),meta.version.substr(1)) === -1) && (currentName === meta.name))){
+            if ((process.env.FIRMATA_VERSION) || (currentName === '') || ((cmp(currentImplVersion.substr(1),meta.version.substr(1)) === -1) && (currentName === meta.name))){
             // if (currentName !== meta.name || currentImplVersion !== meta.version) {
-              console.log(`Start automatic flashing: updating from [${currentName}/${currentImplVersion}]`);
+              console.log(`Start automatic flashing: updating from ${currentImplVersion} to ${meta.version}`);
               return this.flash(filePath).then(() => true);
+              // return true;
             }
             return false;
           });

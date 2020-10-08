@@ -32,7 +32,6 @@ sdk.auth.loginWithToken(token);
 let uuid = process.env.BALENA_DEVICE_UUID || "";
 const BALENA_DEVICE_UUID = uuid;
 
-let firmwareMeta = {name:'StandardFirmata',version:'v2.0.1'};
 
 let getFirmware = function() {
   return new Promise((resolve, reject) => {
@@ -205,7 +204,7 @@ process.on('SIGINT', () => {
 setTag('fin-status', 'awake');
 setTag('wake-eta', 'N/A');
 
-flasher.flashIfNeeded('firmata-v' + ((process.env.FIRMATA_VERSION) ? process.env.FIRMATA_VERSION : process.env.DEFAULT_VERSION) +'.hex', firmwareMeta)
+flasher.flashIfNeeded('firmata-' + (process.env.SELECTED_VERSION) +'.hex', {name:'StandardFirmata',version: process.env.SELECTED_VERSION})
 .then((flashed) => {
   if (!flashed) {
     console.log('Automatic flashing is skipped: the requested firmware is already flashed.');

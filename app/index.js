@@ -112,21 +112,7 @@ app.use(function(req, res, next) {
 });
 app.use(errorHandler);
 
-app.post('/v1/flash/:fw', (req, res) => {
-  if (!req.params.fw) {
-    return res.status(400).send('Bad Request');
-  }
-
-  return flasher.flash(req.params.fw)
-      .then(() => {
-        return res.status(200).send('OK');
-      })
-      .catch((err) => {
-        return res.status(400).send(err.message);
-      });
-});
-
-app.post('/v1/pin/get/:pin', (req, res) => {
+app.post('/pin/get/:pin', (req, res) => {
   if (!req.params.pin) {
     return res.status(400).send('Bad Request');
   }
@@ -139,7 +125,7 @@ app.post('/v1/pin/get/:pin', (req, res) => {
   });
 });
 
-app.post('/v1/pin/set/:pin/:state', (req, res) => {
+app.post('/pin/set/:pin/:state', (req, res) => {
   if (!req.params.pin || !req.params.state) {
     return res.status(400).send('Bad Request');
   }
@@ -150,7 +136,7 @@ app.post('/v1/pin/set/:pin/:state', (req, res) => {
     console.error("device is not responding, check for on-going coprocessor flashing/application updating.");  });
 });
 
-app.post('/v1/sleep/:delay/:timeout', (req, res) => {
+app.post('/sleep/:delay/:timeout', (req, res) => {
   if (!req.params.delay || !req.params.timeout) {
     return res.status(400).send('Bad Request');
   }
@@ -169,7 +155,7 @@ app.post('/v1/sleep/:delay/:timeout', (req, res) => {
       });
 });
 
-app.get('/v1/firmware', (req, res) => {
+app.get('/firmware', (req, res) => {
   getFirmware().then((data) => {
     return res.status(200).send(data.implementationVersion)
   })

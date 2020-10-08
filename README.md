@@ -26,11 +26,11 @@ For example, sending the balenaFin to sleep for 1 minute with a 10 second delay,
 curl localhost:1337/sleep/10/60
 ```
 
-#### [GET] /firmware
+#### [GET] `/firmware`
 
 Retrieves the firmata implementation version.
 
-#### [POST] /sleep/${int:delay}/${int:timeout}
+#### [POST] `/sleep/${int:delay}/${int:timeout}`
 
 triggers the balenaFin power saving mode.
 - `delay` (integer): length of time (seconds) the coprocessor will wait before forcefully shutting down the compute module
@@ -38,7 +38,7 @@ triggers the balenaFin power saving mode.
 There is a limit of 97 years (3,058,992,000 seconds) as the max value the coprocessor can handle.
 - You can override update checks that would otherwise prevent the sleep from being triggered passing `force` in the body of the request: `{"force":1}`
 
-#### [POST] /set/${int:pin}/${int:state}
+#### [POST] `/set/${int:pin}/${int:state}`
 
 set digital pin state on the coprocessor header.
 - `pin` (integer): `Expansion Header` pin numbering as referred to [here](https://github.com/balena-io/balena-fin-coprocessor-firmata#firmata-pin-map).

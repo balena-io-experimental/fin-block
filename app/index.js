@@ -55,39 +55,45 @@ const setTag = (key, val) => {
   });
 };
 
+const search = (nameKey, myArray) => {
+  for (let i=0; i < myArray.length; i++) {
+      if (myArray[i].name === nameKey) {
+          return myArray[i].value;
+      }
+  }
+}
+
 const addConfigVarsIfNeeded = () => {
-  return supervisor.checkForOngoingUpdate()
-      .then(() => {
-        let configNames = []
-        let rebootNeeded = new Boolean(false)
-        sdk.models.device.configVar.getAllByDevice(uuid).then(function(vars) {
-
-        for (i = 0; i < vars.length; i++) {
-          configNames.push(vars[i].name);
-        }
-
-        if (!(configNames.includes('BALENA_HOST_CONFIG_core_freq')))
-        {
-          sdk.models.device.configVar.set(uuid,'BALENA_HOST_CONFIG_core_freq','250').then(function(vars) {
-            rebootNeeded= true;
-            console.log("BALENA_HOST_CONFIG_core_freq added to config vars - reboot needed");
-          });
-        }
-
-        if (!(configNames.includes('BALENA_HOST_CONFIG_dtoverlay')))
-        {
-          sdk.models.device.configVar.set(uuid,'BALENA_HOST_CONFIG_dtoverlay','\"balena-fin\",\"uart1,txd1_pin=32,rxd1_pin=33\"').then(function(vars) {
-            rebootNeeded= true;
-            console.log("BALENA_HOST_CONFIG_dtoverlay added to config vars - reboot needed");
-          });
-        }
-
-        if(rebootNeeded)
-        {
-          return supervisor.shutdown();
-        }
-      });
-    }).catch(() => { throw new Error('Device is not Idle, likely updating, will not add configVars'); });
+    return supervisor.checkForOngoingUpdate()
+        .then(() => {
+            sdk.models.device.configVar.getAllByDevice(uuid)
+            .then((vars)=>{
+              if(search("BALENA_HOST_CONFIG_core_freq", vars) == '250' && search("BALENA_HOST_CONFIG_dtoverlay", vars) == '"balena-fin","uart1,txd1_pin=32,rxd1_pin=33"'){
+                console.log('ConfigVars are set.')
+                return false;
+              }
+              else{
+                return sdk.models.device.configVar.set(uuid,'BALENA_HOST_CONFIG_core_freq','250')
+                .then(() => {
+                  console.log("BALENA_HOST_CONFIG_core_freq added to config vars");
+                  sdk.models.device.configVar.set(uuid,'BALENA_HOST_CONFIG_dtoverlay','\"balena-fin\",\"uart1,txd1_pin=32,rxd1_pin=33\"')
+                  .then(() => {
+                    console.log("BALENA_HOST_CONFIG_dtoverlay added to config vars");
+                    return true;
+                  });
+                });
+              }
+            })
+            .then((result)=>{
+              console.log(`Need to reboot supervisor? ${result}`);
+              if (result){
+                return supervisor.reboot(() => true);
+              }
+            })
+            .catch((err) => { 
+              console.log(err);
+            });
+        })        
 }
 
 const shutdown = (delay, timeout) => {
@@ -227,43 +233,45 @@ setTag('fin-status', 'awake');
 setTag('fin-version', (BALENA_FIN_REVISION === '09' ? '1.0.0' : '1.1.0'));
 setTag('wake-eta', 'N/A');
 
-addConfigVarsIfNeeded();
-
-if(process.env.DEV_MODE == 1){
-  let fsTimeout;
-  console.log('Entering Dev Mode.');
-
-  fs.watch('/data/firmware/', function (event, filename) {
-    if (!fsTimeout) {
-        if (filename.includes(".hex") && fs.existsSync(`/data/firmware/${filename}`)) {
-            flasher.flash(filename)
-            .then(console.log('Rebooting now...'))
-            .catch((err) => {console.log(err)})
-        }
-        fsTimeout = setTimeout(function() { fsTimeout=null }, 1000) // give 1 second for multiple events
-    }
-  });
-}
-else {
-  flasher.flashIfNeeded('firmata-' + (process.env.SELECTED_VERSION) +'.hex', {name:'StandardFirmata',version: process.env.SELECTED_VERSION})
-  .then((flashed) => {
-    if (!flashed) {
-      console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
-    }
-    else {
-      setTag('fin-status', 'flashing');
-    }
-  })
-  .then(() => {
-    getFirmware()
-    .then((data) => {
-      setTag('firmata', data.implementationVersion);
-    })
-    .catch((err) => {
-      console.log(err)
-    })
+addConfigVarsIfNeeded()
+.then(() => {
+  if(process.env.DEV_MODE == 1){
+    let fsTimeout;
+    console.log('Entering Dev Mode.');
+  
+    fs.watch('/data/firmware/', function (event, filename) {
+      if (!fsTimeout) {
+          if (filename.includes(".hex") && fs.existsSync(`/data/firmware/${filename}`)) {
+              flasher.flash(filename)
+              .then(console.log('Rebooting now...'))
+              .catch((err) => {console.log(err)})
+          }
+          fsTimeout = setTimeout(function() { fsTimeout=null }, 1000) // give 1 second for multiple events
+      }
+    });
   }
-  )
-  .catch(console.error);
-}
+  else {
+    flasher.flashIfNeeded('firmata-' + (process.env.SELECTED_VERSION) +'.hex', {name:'StandardFirmata',version: process.env.SELECTED_VERSION})
+    .then((flashed) => {
+      if (!flashed) {
+        console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
+      }
+      else {
+        setTag('fin-status', 'flashing');
+      }
+    })
+    .then(() => {
+      getFirmware()
+      .then((data) => {
+        setTag('firmata', data.implementationVersion);
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    }
+    )
+    .catch(console.error);
+  }
+})
+
 

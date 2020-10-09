@@ -31,9 +31,9 @@
             } else {
               reject(parsedBody);
             }
-
           })
           .catch(function(err) {
+            console.log('Failing to reach supervisor...');
             reject(err);
           });
       });

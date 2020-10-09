@@ -13,6 +13,29 @@ The `firmata` block is a docker image that provides flashing utilities, status t
 - Pin firmata release versions with `FIRMATA_VERSION`
 - Automatically applies device tree overlays required for the coprocessor
 
+## Use
+
+Add the following to your `docker-compose`:
+
+```yaml
+version: '2.1'
+volumes:
+    fin:
+services:
+  finblock:
+    restart: always
+    image: balenaplayground/finblock:latest
+    network_mode: host
+    privileged: true
+    volumes:
+      - 'fin:/data/firmware'
+    labels:
+      io.balena.features.supervisor-api: '1'
+      io.balena.features.balena-api: '1'
+    expose:
+      - "1337"
+```
+
 ## API
 
 The firmata block is controlled by a REST interface and with device variables.

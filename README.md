@@ -1,7 +1,7 @@
-# balena firmata block
+# balena fin block
 
 Provides a simple interface for controlling the balenaFin's coprocessor running the firmata protocol.
-The `firmata` block is a docker image that provides flashing utilities, status tagging, sleep control and firmata control functionality.
+The `fin` block is a docker image that provides flashing utilities, status tagging, sleep control and firmata control functionality.
 
 ## Features
 

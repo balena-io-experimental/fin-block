@@ -48,6 +48,11 @@ For example, sending the balenaFin to sleep for 1 minute with a 10 second delay,
 ```bash
 curl localhost:1337/sleep/10/60
 ```
+#### [GET] `/ping`
+
+Used to know the block is ready to recieve instructions.
+
+*note: this will be expanded to return HTTP unavailable when the device is flashing or about to reboot*
 
 #### [GET] `/firmware`
 

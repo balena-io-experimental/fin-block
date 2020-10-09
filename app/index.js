@@ -242,6 +242,10 @@ app.get('/firmware', (req, res) => {
   })    
 });
 
+app.get('/ping', (req, res) => {
+    return res.status(200);
+});
+
 app.listen(SERVER_PORT, () => {
   console.log('balenaFin revision', BALENA_FIN_REVISION);
   console.log('server listening on port ' + SERVER_PORT);

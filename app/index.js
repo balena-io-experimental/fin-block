@@ -25,6 +25,7 @@ const app = express();
 const flasher = Flasher(BALENA_FIN_REVISION, supervisor, firmata);
 
 const balena = require('balena-sdk');
+const { reject } = require('lodash');
 
 const sdk = balena.fromSharedOptions();
 let token = process.env.BALENA_API_KEY || "";
@@ -63,8 +64,31 @@ const search = (nameKey, myArray) => {
   }
 }
 
+const setConfigVars = (required) => {
+  return new Promise((resolve, reject) => {
+    if(required){
+    sdk.models.device.configVar.set(uuid,'BALENA_HOST_CONFIG_core_freq','250')
+    .then(() => {
+      console.log("BALENA_HOST_CONFIG_core_freq added to config vars");
+      sdk.models.device.configVar.set(uuid,'BALENA_HOST_CONFIG_dtoverlay','\"balena-fin\",\"uart1,txd1_pin=32,rxd1_pin=33\"')
+      .then(() => {
+        console.log("BALENA_HOST_CONFIG_dtoverlay added to config vars");
+        resolve(true);
+      });
+    });
+  }
+  else{
+    resolve(false);
+  }
+})
+.catch(() => {
+  reject(err);
+});
+}
+
 const addConfigVarsIfNeeded = () => {
-    return supervisor.checkForOngoingUpdate()
+  return new Promise((resolve, reject) => {
+    return supervisor.checkForOngoingUpdate() //remove return??
         .then(() => {
             sdk.models.device.configVar.getAllByDevice(uuid)
             .then((vars)=>{
@@ -73,27 +97,26 @@ const addConfigVarsIfNeeded = () => {
                 return false;
               }
               else{
-                return sdk.models.device.configVar.set(uuid,'BALENA_HOST_CONFIG_core_freq','250')
-                .then(() => {
-                  console.log("BALENA_HOST_CONFIG_core_freq added to config vars");
-                  sdk.models.device.configVar.set(uuid,'BALENA_HOST_CONFIG_dtoverlay','\"balena-fin\",\"uart1,txd1_pin=32,rxd1_pin=33\"')
-                  .then(() => {
-                    console.log("BALENA_HOST_CONFIG_dtoverlay added to config vars");
-                    return true;
-                  });
-                });
+                return true;
               }
             })
-            .then((result)=>{
-              console.log(`Need to reboot supervisor? ${result}`);
-              if (result){
-                return supervisor.reboot(() => true);
-              }
+            .then((check) => {
+              return setConfigVars(check)
+              .then((result)=>{
+                console.log(`Need to reboot supervisor? ${result}`);
+                if (result){
+                  return supervisor.reboot(() => true);
+                }
+                else {
+                  resolve();
+                }
+              });
             })
-            .catch((err) => { 
-              console.log(err);
-            });
-        })        
+        })       
+        .catch((err) => { 
+          reject(err);
+        }); 
+      });
 }
 
 const shutdown = (delay, timeout) => {

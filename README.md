@@ -46,7 +46,7 @@ This is a web API hosted at port `1337` on the local device.
 For example, sending the balenaFin to sleep for 1 minute with a 10 second delay, using `curl`:
 
 ```bash
-curl localhost:1337/sleep/10/60
+curl -X POST localhost:1337/sleep/10/60
 ```
 #### [GET] `/ping`
 

@@ -1,6 +1,6 @@
 
 ## Build with buildx
-docker buildx build -t balenaplayground/finblock:latest --platform linux/arm/v7 --file Dockerfile.template .
+docker buildx build -t balenablocks/finabler::latest --platform linux/arm/v7 --file Dockerfile.template .
 
 ## Push to the repo
-docker push balenaplayground/finblock:latest
+docker push balenablocks/finabler::latest

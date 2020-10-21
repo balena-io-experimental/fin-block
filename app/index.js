@@ -243,7 +243,7 @@ app.get('/firmware', (req, res) => {
 });
 
 app.get('/ping', (req, res) => {
-    return res.status(200);
+    return res.status(200).send('OK');
 });
 
 app.listen(SERVER_PORT, () => {

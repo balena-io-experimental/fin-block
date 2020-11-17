@@ -256,8 +256,31 @@ process.on('SIGINT', () => {
   process.exit();
 });
 
+let getVersion = function(revision) {
+  return new Promise((resolve, reject) => {
+    switch(revision) {
+      case '09':
+        resolve("v1.0.0");
+        break;
+      case '10':
+        resolve("v1.1.0");
+      case '11':
+        resolve("v1.1.1");
+      default:
+        reject("balenaFin version undefined...");;
+    } 
+  })
+};
+
+
 setTag('fin-status', 'awake');
-setTag('fin-version', (BALENA_FIN_REVISION === '09' ? '1.0.0' : '1.1.0'));
+getVersion(BALENA_FIN_REVISION)
+.then((version) => {
+  setTag('fin-version', version);
+})
+.catch((error) => {
+  console.log(error);
+});
 setTag('wake-eta', 'N/A');
 
 addConfigVarsIfNeeded()

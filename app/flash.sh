@@ -24,6 +24,9 @@ case $REV in
   10)
     screen -dmS swd_program  "./openocd/openocd-v1.1.sh"
     ;;
+  11)
+    screen -dmS swd_program  "./openocd/openocd-v1.1.sh"
+    ;;
   *)
     echo "ERROR: unknown balenaFin revision" >&2
     flock -u "$lock_fd"; rm -f /tmp/balena/updates.lock

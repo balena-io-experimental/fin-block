@@ -1,0 +1,5 @@
+docker:
+  builds:
+    - path: .
+      docker_repo: balenablocks/finabler
+      dockerfile: Dockerfile.template

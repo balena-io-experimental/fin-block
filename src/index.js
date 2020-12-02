@@ -36,7 +36,7 @@ const BALENA_DEVICE_UUID = uuid;
 
 process.on("unhandledRejection", (error) => {
   console.error(error); // This prints error with stack included (as for normal errors)
-  throw error; // Following best practices re-throw error and let the process exit with error code
+  // throw error; // Following best practices re-throw error and let the process exit with error code
 });
 
 let getFirmware = function() {

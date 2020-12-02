@@ -4,7 +4,10 @@
   "description": "balenaBlock that provides a simple interface for controlling the balenaFin's coprocessor running the firmata protocol.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docker-dev": "docker run -d -p 5000:5000 --restart=always --name registry registry:2 || true && docker buildx build -t localhost:5000/finabler:latest --platform linux/arm/v7 --file Dockerfile.template . && docker push localhost:5000/finabler:latest",
+    "docker-release": "docker buildx build -t balenablocks/finabler:latest --platform linux/arm/v7 --file Dockerfile.template . && docker push balenablocks/finabler:latest",
+    "balena": "balena deploy --build --source example/ $npm_config_app"
   },
   "repository": {
     "type": "git",
@@ -47,7 +50,7 @@
     "node-gtk": "^0.4.0",
     "onoff": "^6.0.0",
     "request": "^2.88.2",
-    "request-promise-native": "^1.0.8",
+    "promise-request-retry": "^1.0.1",
     "semver-compare": "^1.0.0",
     "serialport": "^9.0.0"
   }

@@ -7,7 +7,7 @@ RELEASE_PATH=https://github.com/balena-io/balena-fin-coprocessor-firmata/release
 if ! test -f /data/firmware/bootloader.s37 ;
     then
         echo "Copying bootloader.s37"
-        cp firmware/bootloader.s37 /data/firmware/bootloader.s37
+        cp openocd/bootloader.s37 /data/firmware/bootloader.s37
 fi
 
 if [[ "$FIRMATA_VERSION" == "latest" ]];

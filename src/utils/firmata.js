@@ -1,6 +1,6 @@
 #!/bin/env node
-
-{
+ 
+try {
   const gi = require('node-gtk');
   Fin = gi.require('Fin', '0.2');
   const fin = new Fin.Client();
@@ -12,6 +12,7 @@
   } else {
     port = process.env.SERIALPORT || "/dev/ttyS0";
   }
+  
   const board = new Firmata(port, {skipCapabilities: true});
   const debug = require('debug')('firmata');
 
@@ -121,4 +122,7 @@
 
   };
   module.exports = firmata();
+}
+catch (error) {
+  console.error(error);
 }

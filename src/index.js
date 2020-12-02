@@ -34,6 +34,10 @@ sdk.auth.loginWithToken(token);
 let uuid = process.env.BALENA_DEVICE_UUID || "";
 const BALENA_DEVICE_UUID = uuid;
 
+process.on("unhandledRejection", (error) => {
+  console.error(error); // This prints error with stack included (as for normal errors)
+  // throw error; // Following best practices re-throw error and let the process exit with error code
+});
 
 let getFirmware = function() {
   return new Promise((resolve, reject) => {
@@ -50,8 +54,12 @@ let getFirmware = function() {
 
 const setTag = (key, val) => {
   return new Promise((resolve, reject) => {
-    console.log(`setting ${key} to ${val}...`);
-    sdk.models.device.tags.set(BALENA_DEVICE_UUID, key, val);
+    console.log(`setting ${key} tag to ${val}...`);
+    sdk.models.device.tags.set(BALENA_DEVICE_UUID, key, val)
+    .catch((error) => {
+      console.log('Error ', error);
+      reject();
+    });
     resolve();
   });
 };
@@ -74,6 +82,10 @@ const setConfigVars = (required) => {
       .then(() => {
         console.log("BALENA_HOST_CONFIG_dtoverlay added to config vars");
         resolve(true);
+      })
+      .catch((error) => {
+        console.log('Error ', error);
+        reject();
       });
     });
   }
@@ -88,7 +100,7 @@ const setConfigVars = (required) => {
 
 const addConfigVarsIfNeeded = () => {
   return new Promise((resolve, reject) => {
-    return supervisor.checkForOngoingUpdate() //remove return??
+    return supervisor.checkForOngoingUpdate() 
         .then(() => {
             sdk.models.device.configVar.getAllByDevice(uuid)
             .then((vars)=>{
@@ -97,6 +109,7 @@ const addConfigVarsIfNeeded = () => {
                 return false;
               }
               else{
+                console.log('ConfigVars are not set.')
                 return true;
               }
             })
@@ -112,9 +125,13 @@ const addConfigVarsIfNeeded = () => {
                 }
               });
             })
+            .catch((error) => {
+              console.log('Error ', error);
+              reject();
+            });
         })       
         .catch((err) => { 
-          reject(err);
+          throw new Error('cannot reach supervisor'); 
         }); 
       });
 }
@@ -131,27 +148,36 @@ const shutdown = (delay, timeout) => {
           });
         });
       })
-      .catch(() => { throw new Error('Device is not Idle, likely updating, will not shutdown'); });
+      .catch(() => { 
+        throw new Error('Device is not Idle, likely updating, will not shutdown'); 
+      });
 };
 
 let getPin = function(pin) {
   return new Promise((resolve, reject) => {
-    supervisor.checkForOngoingUpdate().then((response) => {
+    supervisor.checkForOngoingUpdate()
+    .then((response) => {
       firmata.getPin(parseInt(pin));
       resolve();
-    }).catch((response) => {
-      reject("coprocessor is not responding...");
+    })
+    .catch((response) => {
+      throw new Error('cannot reach supervisor'); 
+      // reject("coprocessor is not responding...");
     });
   });
 };
 
 let setPin = function(pin,state) {
   return new Promise((resolve, reject) => {
-    supervisor.checkForOngoingUpdate().then((response) => {
+    supervisor.checkForOngoingUpdate()
+    .then((response) => {
       firmata.setPin(parseInt(pin), parseInt(state));
       resolve();
-    }).catch((response) => {
-      reject("coprocessor is not responding...");
+    })
+    .catch((response) => {
+      throw new Error('cannot reach supervisor'); 
+
+      // reject("coprocessor is not responding...");
     });
   });
 };
@@ -314,6 +340,17 @@ addConfigVarsIfNeeded()
       getFirmware()
       .then((data) => {
         setTag('firmata', data.implementationVersion);
+      })
+      .then(() => {
+        if(process.env.ONE_SHOT == 1){
+          return supervisor.stopService()
+          .then(() => {
+            console.log("ONE_SHOT enabled. Stopping container...")
+          })
+          .catch(() => {
+            console.log(err)
+          })
+        }
       })
       .catch((err) => {
         console.log(err)

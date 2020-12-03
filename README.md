@@ -10,7 +10,7 @@ The `finabler` block is a docker image that provides flashing utilities, status 
 - Retrieve firmata implementation version
 - Automatically flash latest firmata firmware to the coprocessor
 - Ability to set `DEV_MODE` for on device firmware development
-- Pin firmata release versions with `FIRMATA_VERSION`
+- Pin the firmata release version with `FIRMATA_VERSION`
 - Automatically applies device tree overlays required for the coprocessor
 
 ## Use
@@ -38,7 +38,7 @@ services:
 
 ## API
 
-The firmata block is controlled by a REST interface and with device variables.
+The firmata block is partly controlled with a REST interface and partly with device variables.
 
 ### REST Interface
 

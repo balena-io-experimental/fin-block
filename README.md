@@ -36,9 +36,9 @@ services:
       - "1337"
 ```
 
-## API
+## How to use
 
-The firmata block is controlled by a REST interface and with device variables.
+The firmata block is controlled partly with a REST interface and partly with device variables.
 
 ### REST Interface
 

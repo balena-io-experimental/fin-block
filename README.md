@@ -22,7 +22,7 @@ version: '2.1'
 volumes:
     fin:
 services:
-  finblock:
+  finabler:
     restart: always
     image: balenablocks/finabler:latest
     network_mode: host

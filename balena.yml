@@ -1,0 +1,14 @@
+version: "2"
+slug: "finabler"
+name: "finabler"
+type: "sw.application"
+assets:
+  - url: "https://github.com/balenablocks/finabler"
+    name: "repository"
+  - url: "https://raw.githubusercontent.com/balenablocks/finabler/main/logo.png"
+    name: "logo"
+data:
+  description: "Provides a simple interface for controlling the balenaFin's coprocessor running the firmata protocol."
+  defaultDeviceType: "fincm3"
+  supportedDeviceTypes:
+    - "fincm3"

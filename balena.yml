@@ -1,0 +1,16 @@
+name: "finabler"
+description: "Provides a simple interface for controlling the balenaFin's coprocessor running the firmata protocol."
+type: "sw.application"
+assets:
+  repository:
+    type: "blob.asset"
+    data:
+      url: "https://github.com/balenablocks/finabler"
+  logo:
+    type: "blob.asset"
+    data:
+      url: "https://raw.githubusercontent.com/balenablocks/finabler/main/logo.png"
+data:
+  defaultDeviceType: "fincm3"
+  supportedDeviceTypes:
+    - "fincm3"

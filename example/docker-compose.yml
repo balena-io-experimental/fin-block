@@ -4,7 +4,7 @@ volumes:
 services:
   finabler:
     restart: always
-    image: localhost:5000/finabler:latest
+    image: balenablocks/finabler:latest
     network_mode: host
     privileged: true
     volumes:

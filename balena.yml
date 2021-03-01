@@ -1,5 +1,6 @@
 name: "finabler"
 description: "Provides a simple interface for controlling the balenaFin's coprocessor running the firmata protocol."
+version: x.x.x
 type: "sw.application"
 assets:
   repository:

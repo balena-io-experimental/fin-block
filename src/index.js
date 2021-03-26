@@ -11,9 +11,9 @@ const fin = new Fin.Client();
 const BALENA_FIN_REVISION = fin.revision;
 let port;
 if (BALENA_FIN_REVISION === '09') {
-  port = process.env.SERIALPORT || "/dev/ttyUSB0";
+  port = process.env.SERIALPORT || '/dev/ttyUSB0';
 } else {
-  port = process.env.SERIALPORT || "/dev/ttyS0";
+  port = process.env.SERIALPORT || '/dev/ttyS0';
 }
 const SERVER_PORT = parseInt(process.env.SERVER_PORT) || 1337;
 
@@ -24,180 +24,250 @@ const Flasher = require(__dirname + '/flasher.js');
 const app = express();
 const flasher = Flasher(BALENA_FIN_REVISION, supervisor, firmata);
 
-const balena = require('balena-sdk');
 const { reject } = require('lodash');
 
-const sdk = balena.fromSharedOptions();
-let token = process.env.BALENA_API_KEY || "";
-sdk.auth.loginWithToken(token);
+let token = process.env.BALENA_API_KEY || '';
 
-let uuid = process.env.BALENA_DEVICE_UUID || "";
+if(token !== ''){
+    console.log("Found BALENA_API_KEY");
+    const balena = require('balena-sdk');
+    const sdk = balena.fromSharedOptions();
+    sdk.auth.loginWithToken(token);
+}
+
+let uuid = process.env.BALENA_DEVICE_UUID || '';
 const BALENA_DEVICE_UUID = uuid;
 
-process.on("unhandledRejection", (error) => {
+process.on('unhandledRejection', error => {
   console.error(error); // This prints error with stack included (as for normal errors)
   // throw error; // Following best practices re-throw error and let the process exit with error code
 });
 
 let getFirmware = function() {
   return new Promise((resolve, reject) => {
-      firmata.queryFirmware()
-      .then((data) => {
+    firmata
+      .queryFirmware()
+      .then(data => {
         console.log(`returning firmware version ${data.implementationVersion}`);
         resolve(data);
       })
       .catch(() => {
         reject('failed to return firmware version, likely failed flashing.');
-      })
+      });
   });
 };
 
 const setTag = (key, val) => {
   return new Promise((resolve, reject) => {
     console.log(`setting ${key} tag to ${val}...`);
-    sdk.models.device.tags.set(BALENA_DEVICE_UUID, key, val)
-    .catch((error) => {
-      console.log('Error ', error);
-      reject();
+    return supervisor
+    .checkLocalMode()
+    .then((localmode) => {
+        // console.log(`Local mode: ${localmode}`);
+        process.env[key] = val;
+        fs.appendFileSync("/root/.bashrc", `export ${key}=${val}\r\n`);
+        if(localmode === "0") {
+            sdk.models.device.tags.set(BALENA_DEVICE_UUID, key, val)
+            .then(() => {
+                resolve();
+            })
+            .catch(error => {
+                console.log('Error ', error);
+                reject();
+            });
+        }  
     });
-    resolve();
   });
 };
 
 const search = (nameKey, myArray) => {
-  for (let i=0; i < myArray.length; i++) {
-      if (myArray[i].name === nameKey) {
-          return myArray[i].value;
-      }
+  for (let i = 0; i < myArray.length; i++) {
+    if (myArray[i].name === nameKey) {
+      return myArray[i].value;
+    }
   }
-}
+};
 
-const setConfigVars = (required) => {
+const setConfigVars = required => {
   return new Promise((resolve, reject) => {
-    if(required){
-    sdk.models.device.configVar.set(uuid,'BALENA_HOST_CONFIG_core_freq','250')
-    .then(() => {
-      console.log("BALENA_HOST_CONFIG_core_freq added to config vars");
-      sdk.models.device.configVar.set(uuid,'BALENA_HOST_CONFIG_dtoverlay','\"balena-fin\",\"uart1,txd1_pin=32,rxd1_pin=33\"')
-      .then(() => {
-        console.log("BALENA_HOST_CONFIG_dtoverlay added to config vars");
-        resolve(true);
-      })
-      .catch((error) => {
-        console.log('Error ', error);
-        reject();
-      });
-    });
-  }
-  else{
-    resolve(false);
-  }
-})
-.catch(() => {
-  reject(err);
-});
-}
-
-const addConfigVarsIfNeeded = () => {
-  return new Promise((resolve, reject) => {
-    return supervisor.checkForOngoingUpdate() 
+    if (required) {
+      sdk.models.device.configVar
+        .set(uuid, 'BALENA_HOST_CONFIG_core_freq', '250')
         .then(() => {
-            sdk.models.device.configVar.getAllByDevice(uuid)
-            .then((vars)=>{
-              if(search("BALENA_HOST_CONFIG_core_freq", vars) == '250' && search("BALENA_HOST_CONFIG_dtoverlay", vars) == '"balena-fin","uart1,txd1_pin=32,rxd1_pin=33"'){
-                console.log('ConfigVars are set.')
-                return false;
-              }
-              else{
-                console.log('ConfigVars are not set.')
-                return true;
-              }
+          console.log('BALENA_HOST_CONFIG_core_freq added to config vars');
+          sdk.models.device.configVar
+            .set(
+              uuid,
+              'BALENA_HOST_CONFIG_dtoverlay',
+              '"balena-fin","uart1,txd1_pin=32,rxd1_pin=33"',
+            )
+            .then(() => {
+              console.log('BALENA_HOST_CONFIG_dtoverlay added to config vars');
+              resolve(true);
             })
-            .then((check) => {
-              return setConfigVars(check)
-              .then((result)=>{
-                console.log(`Need to reboot supervisor? ${result}`);
-                if (result){
-                  return supervisor.reboot(() => true);
-                }
-                else {
-                  resolve();
-                }
-              });
-            })
-            .catch((error) => {
+            .catch(error => {
               console.log('Error ', error);
               reject();
             });
-        })       
-        .catch((err) => { 
-          throw new Error('cannot reach supervisor'); 
-        }); 
+        });
+    } else {
+      resolve(false);
+    }
+  }).catch(() => {
+    reject(err);
+  });
+};
+
+const addConfigVarsIfNeeded = () => {
+  return new Promise((resolve, reject) => {
+    return supervisor
+      .checkForOngoingUpdate()
+      .then(() => {
+        supervisor
+          .getOverlay()
+          .then(payload => {
+            if (typeof payload === 'undefined') {
+              console.log(`Trying balenaCloud API`);
+              return;
+            } else if (
+              payload.state.local.config.HOST_CONFIG_dtoverlay ===
+                '"balena-fin","uart1,txd1_pin=32,rxd1_pin=33"' &&
+              payload.state.local.config.HOST_CONFIG_core_freq === '250'
+            ) {
+              console.log('Config overlays are already set!');
+              return resolve();
+            } else if (
+              payload.state.local.config.SUPERVISOR_LOCAL_MODE === '0'
+            ) {
+              console.log(
+                `Device is not in local mode; Trying balenaCloud API`,
+              );
+              return;
+            } else {
+              supervisor.setOverlay().then(error => {
+                if (!error) {
+                  console.log('Config overlay have been set!');
+                  return resolve();
+                } else {
+                  console.log(error.error.message);
+                }
+              });
+            }
+          })
+          .then(() => {
+            supervisor
+            .checkLocalMode()
+            .then((localmode) => {
+                if(localmode === "0") {
+                    sdk.models.device.configVar
+                    .getAllByDevice(uuid)
+                    .then(vars => {
+                        if (
+                        search('BALENA_HOST_CONFIG_core_freq', vars) == '250' &&
+                        search('BALENA_HOST_CONFIG_dtoverlay', vars) ==
+                            '"balena-fin","uart1,txd1_pin=32,rxd1_pin=33"'
+                        ) {
+                        console.log('ConfigVars are set.');
+                        return false;
+                        } else {
+                        console.log('ConfigVars are not set.');
+                        return true;
+                        }
+                    })
+                    .then(check => {
+                        return setConfigVars(check).then(result => {
+                        console.log(`Need to reboot supervisor? ${result}`);
+                        if (result) {
+                            return supervisor.reboot(() => true);
+                        } else {
+                            resolve();
+                        }
+                        });
+                    });
+                }
+            });
+          })
+          .catch(error => {
+            console.log('Error ', error);
+            reject();
+          });
+      })
+      .catch(err => {
+        throw new Error('cannot reach supervisor');
       });
-}
+  });
+};
 
 const shutdown = (delay, timeout) => {
-  return supervisor.checkForOngoingUpdate()
-      .then(() => {
-        setTag('fin-status', 'sleeping').then(() => {
-          var parsedDate = new Date()
-          var newDate = new Date(parsedDate.getTime() + (1000 * timeout))
-          setTag('wake-eta', dateFormat(newDate, "isoDateTime")).then(() => {
-            firmata.sleep(parseInt(delay), parseInt(timeout));
-            return supervisor.shutdown();
-          });
+  return supervisor
+    .checkForOngoingUpdate()
+    .then(() => {
+      setTag('fin_status', 'sleeping').then(() => {
+        var parsedDate = new Date();
+        var newDate = new Date(parsedDate.getTime() + 1000 * timeout);
+        setTag('wake_eta', dateFormat(newDate, 'isoDateTime')).then(() => {
+          firmata.sleep(parseInt(delay), parseInt(timeout));
+          return supervisor.shutdown();
         });
-      })
-      .catch(() => { 
-        throw new Error('Device is not Idle, likely updating, will not shutdown'); 
       });
+    })
+    .catch(() => {
+      throw new Error('Device is not Idle, likely updating, will not shutdown');
+    });
 };
 
 let getPin = function(pin) {
   return new Promise((resolve, reject) => {
-    supervisor.checkForOngoingUpdate()
-    .then((response) => {
-      firmata.getPin(parseInt(pin));
-      resolve();
-    })
-    .catch((response) => {
-      throw new Error('cannot reach supervisor'); 
-      // reject("coprocessor is not responding...");
-    });
+    supervisor
+      .checkForOngoingUpdate()
+      .then(response => {
+        firmata.getPin(parseInt(pin));
+        resolve();
+      })
+      .catch(response => {
+        throw new Error('cannot reach supervisor');
+        // reject("coprocessor is not responding...");
+      });
   });
 };
 
-let setPin = function(pin,state) {
+let setPin = function(pin, state) {
   return new Promise((resolve, reject) => {
-    supervisor.checkForOngoingUpdate()
-    .then((response) => {
-      firmata.setPin(parseInt(pin), parseInt(state));
-      resolve();
-    })
-    .catch((response) => {
-      throw new Error('cannot reach supervisor'); 
+    supervisor
+      .checkForOngoingUpdate()
+      .then(response => {
+        firmata.setPin(parseInt(pin), parseInt(state));
+        resolve();
+      })
+      .catch(response => {
+        throw new Error('cannot reach supervisor');
 
-      // reject("coprocessor is not responding...");
-    });
+        reject("coprocessor is not responding...");
+      });
   });
 };
 
 const errorHandler = (err, req, res, next) => {
   res.status(500);
   res.render('error', {
-    error: err
+    error: err,
   });
 };
 
 app.use(compression());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  }),
+);
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
+  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept',
+  );
   next();
 });
 app.use(errorHandler);
@@ -207,13 +277,14 @@ app.post('/flash/:fw', (req, res) => {
     return res.status(400).send('Bad Request');
   }
 
-  return flasher.flash(req.params.fw)
-      .then(() => {
-        return res.status(200).send('OK');
-      })
-      .catch((err) => {
-        return res.status(400).send(err.message);
-      });
+  return flasher
+    .flash(req.params.fw)
+    .then(() => {
+      return res.status(200).send('OK');
+    })
+    .catch(err => {
+      return res.status(400).send(err.message);
+    });
 });
 
 app.post('/pin/get/:pin', (req, res) => {
@@ -221,12 +292,16 @@ app.post('/pin/get/:pin', (req, res) => {
     return res.status(400).send('Bad Request');
   }
   console.log('get pin ' + req.params.pin + ' state');
-  getPin(req.params.pin, req.params.state).then((data)=> {
-    res.status(200).send(data);
-  }).catch((error) => {
-    console.error("device is not responding, check for on-going coprocessor flashing/application updating.");  
-    res.status(400);
-  });
+  getPin(req.params.pin, req.params.state)
+    .then(data => {
+      res.status(200).send(data);
+    })
+    .catch(error => {
+      console.error(
+        'device is not responding, check for on-going coprocessor flashing/application updating.',
+      );
+      res.status(400);
+    });
 });
 
 app.post('/pin/set/:pin/:state', (req, res) => {
@@ -234,10 +309,15 @@ app.post('/pin/set/:pin/:state', (req, res) => {
     return res.status(400).send('Bad Request');
   }
   console.log('set pin ' + req.params.pin + ' to state ' + req.params.state);
-  setPin(req.params.pin, req.params.state).then(()=> {
-    res.status(200).send('OK');
-  }).catch((error) => {
-    console.error("device is not responding, check for on-going coprocessor flashing/application updating.");  });
+  setPin(req.params.pin, req.params.state)
+    .then(() => {
+      res.status(200).send('OK');
+    })
+    .catch(error => {
+      console.error(
+        'device is not responding, check for on-going coprocessor flashing/application updating.',
+      );
+    });
 });
 
 app.post('/sleep/:delay/:timeout', (req, res) => {
@@ -245,31 +325,34 @@ app.post('/sleep/:delay/:timeout', (req, res) => {
     return res.status(400).send('Bad Request');
   }
   if (parseInt(BALENA_FIN_REVISION) < 10) {
-    return res.status(405).send('Feature not available on current hardware revision');
+    return res
+      .status(405)
+      .send('Feature not available on current hardware revision');
   }
 
   shutdown(req.params.delay, req.params.timeout)
-      .then(() => {
-        console.error("Sleep command registered, shutting down...");
-        res.status(200).send('OK');
-      })
-      .catch((error) => {
-        console.error(`Error registering sleep command: ${error.message}`);
-        throw error;
-      });
+    .then(() => {
+      console.error('Sleep command registered, shutting down...');
+      res.status(200).send('OK');
+    })
+    .catch(error => {
+      console.error(`Error registering sleep command: ${error.message}`);
+      throw error;
+    });
 });
 
 app.get('/firmware', (req, res) => {
-  getFirmware().then((data) => {
-    return res.status(200).send(data.implementationVersion)
-  })
-  .catch((error) => {
-    return res.status(405).send('Firmata is unreachable.');
-  })    
+  getFirmware()
+    .then(data => {
+      return res.status(200).send(data.implementationVersion);
+    })
+    .catch(error => {
+      return res.status(405).send('Firmata is unreachable.');
+    });
 });
 
 app.get('/ping', (req, res) => {
-    return res.status(200).send('OK');
+  return res.status(200).send('OK');
 });
 
 app.listen(SERVER_PORT, () => {
@@ -284,81 +367,93 @@ process.on('SIGINT', () => {
 
 let getVersion = function(revision) {
   return new Promise((resolve, reject) => {
-    switch(revision) {
+    switch (revision) {
       case '09':
-        resolve("v1.0.0");
+        resolve('v1.0.0');
         break;
       case '10':
-        resolve("v1.1.0");
+        resolve('v1.1.0');
       case '11':
-        resolve("v1.1.1");
+        resolve('v1.1.1');
       default:
-        reject("balenaFin version undefined...");;
-    } 
-  })
+        reject('balenaFin version undefined...');
+    }
+  });
 };
 
-
-setTag('fin-status', 'awake');
+setTag('fin_status', 'awake');
 getVersion(BALENA_FIN_REVISION)
-.then((version) => {
-  setTag('fin-version', version);
-})
-.catch((error) => {
-  console.log(error);
-});
-setTag('wake-eta', 'N/A');
+  .then(version => {
+    setTag('fin_version', version);
+  })
+  .catch(error => {
+    console.log(error);
+  });
+setTag('wake_eta', 'N/A');
 
-addConfigVarsIfNeeded()
-.then(() => {
-  if(process.env.DEV_MODE == 1){
-    let fsTimeout;
-    console.log('Entering Dev Mode.');
-  
-    fs.watch('/data/firmware/', function (event, filename) {
-      if (!fsTimeout) {
-          if (filename.includes(".hex") && fs.existsSync(`/data/firmware/${filename}`)) {
-              flasher.flash(filename)
-              .then(console.log('Rebooting now...'))
-              .catch((err) => {console.log(err)})
-          }
-          fsTimeout = setTimeout(function() { fsTimeout=null }, 1000) // give 1 second for multiple events
-      }
+addConfigVarsIfNeeded().then(() => {
+    setTag('FLASHED', 0);
+    process.env.FLASHED = 0; 
+    if (process.env.DEV_MODE == 1) {
+        let fsTimeout;
+        console.log('Entering Dev Mode.');
+
+        fs.watch('/data/firmware/', function(event, filename) {
+        if (!fsTimeout) {
+            if (
+            filename.includes('.hex') &&
+            fs.existsSync(`/data/firmware/${filename}`)
+            ) {
+            flasher
+                .flash(filename)
+                .then(console.log('Rebooting now...'))
+                .catch(err => {
+                console.log(err);
+                });
+            }
+            fsTimeout = setTimeout(function() {
+            fsTimeout = null;
+            }, 1000); // give 1 second for multiple events
+        }
     });
-  }
-  else {
-    flasher.flashIfNeeded('firmata-' + (process.env.SELECTED_VERSION) +'.hex', {name:'StandardFirmata',version: process.env.SELECTED_VERSION})
-    .then((flashed) => {
-      if (!flashed) {
-        console.log('Automatic flashing is skipped: the requested firmware is already flashed.');
-      }
-      else {
-        setTag('fin-status', 'flashing');
-      }
-    })
-    .then(() => {
-      getFirmware()
-      .then((data) => {
-        setTag('firmata', data.implementationVersion);
+  } else {
+    flasher
+      .flashIfNeeded('firmata-' + process.env.SELECTED_VERSION + '.hex', {
+        name: 'StandardFirmata',
+        version: process.env.SELECTED_VERSION,
       })
-      .then(() => {
-        if(process.env.ONE_SHOT == 1){
-          return supervisor.stopService()
-          .then(() => {
-            console.log("ONE_SHOT enabled. Stopping container...")
-          })
-          .catch(() => {
-            console.log(err)
-          })
+      .then(flashed => {
+        if (!flashed) {
+          console.log(
+            'Automatic flashing is skipped: the requested firmware is already flashed.',
+          );
+          process.env.FLASHED = 1; 
+          setTag('FLASHED', 1);
+        } else {
+          setTag('fin_status', 'flashing');
         }
       })
-      .catch((err) => {
-        console.log(err)
+      .then(() => {
+        getFirmware()
+          .then(data => {
+            setTag('firmata', data.implementationVersion);
+          })
+          .then(() => {
+            if (process.env.ONE_SHOT == 1) {
+              return supervisor
+                .stopService()
+                .then(() => {
+                  console.log('ONE_SHOT enabled. Stopping container...');
+                })
+                .catch(() => {
+                  console.log(err);
+                });
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
       })
-    }
-    )
-    .catch(console.error);
+      .catch(console.error);
   }
-})
-
-
+});

@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint src/**/*.js --fix",
     "docker-dev": "docker run -d -p 5000:5000 --restart=always --name registry registry:2 || true && docker buildx build -t localhost:5000/finabler:latest --platform linux/arm/v7 --file Dockerfile.template . && docker push localhost:5000/finabler:latest",
     "docker-release": "docker buildx build -t balenablocks/finabler:latest --platform linux/arm/v7 --file Dockerfile.template . && docker push balenablocks/finabler:latest",
     "balena": "balena deploy --build --source example/ $npm_config_app"
@@ -39,6 +40,7 @@
   },
   "homepage": "https://github.com/balenablocks/finabler#readme",
   "dependencies": {
+    "@balena/lint": "^5.4.1",
     "balena-sdk": "^12.30.0",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
@@ -49,9 +51,15 @@
     "lodash": "^4.17.15",
     "node-gtk": "^0.4.0",
     "onoff": "^6.0.0",
-    "request": "^2.88.2",
     "promise-request-retry": "^1.0.1",
+    "request": "^2.88.2",
     "semver-compare": "^1.0.0",
     "serialport": "^9.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^1.18.2",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint": "^7.22.0"
   }
 }

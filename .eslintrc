@@ -1,0 +1,32 @@
+{
+    "extends": [
+      "plugin:prettier/recommended"
+    ],
+    "plugins": [
+      "prettier"
+    ],
+    "rules": {
+      "prettier/prettier": [
+        "error",
+        {
+          "singleQuote": true,
+          "semi": true,
+          "quoteProps": "as-needed",
+          "jsxSingleQuote": true,
+          "trailingComma": "all",
+          "bracketSpacing": true,
+          "jsxBracketSameLine": false,
+          "arrowParens": "avoid",
+          "endOfLine": "lf"
+        }
+      ]
+    },
+    "env": {
+      "node": true,
+      "es6": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2019,
+      "sourceType": "module"
+    }
+  }

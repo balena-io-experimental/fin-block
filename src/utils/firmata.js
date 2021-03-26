@@ -1,26 +1,26 @@
 #!/bin/env node
- 
+
 try {
   const gi = require('node-gtk');
   Fin = gi.require('Fin', '0.2');
   const fin = new Fin.Client();
   const BALENA_FIN_REVISION = fin.revision;
-  const Firmata = require("firmata");
+  const Firmata = require('firmata');
   let port;
   if (BALENA_FIN_REVISION === '09') {
-    port = process.env.SERIALPORT || "/dev/ttyUSB0";
+    port = process.env.SERIALPORT || '/dev/ttyUSB0';
   } else {
-    port = process.env.SERIALPORT || "/dev/ttyS0";
+    port = process.env.SERIALPORT || '/dev/ttyS0';
   }
-  
-  const board = new Firmata(port, {skipCapabilities: true});
+
+  const board = new Firmata(port, { skipCapabilities: true });
   const debug = require('debug')('firmata');
 
   String.prototype.splice = function(idx, rem, str) {
     return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
   };
 
-  const balenaSysex = 0x0B;
+  const balenaSysex = 0x0b;
   const balenaSysexSubCommandFirmware = 0x00;
 
   let self;
@@ -46,7 +46,7 @@ try {
         sleep_data = (sleep_data - byte) / 256;
       }
       // insert balena command
-      byteArray.splice(0, 0, 0x0B);
+      byteArray.splice(0, 0, 0x0b);
       // insert balena subcommand
       byteArray.splice(1, 0, 0x01);
       byteArray.splice(2, 0, delay_data);
@@ -63,7 +63,7 @@ try {
 
     this.padData = function(input_string) {
       for (var i = 1; i < 6; i++) {
-        input_string = input_string.splice((i * -7) - ((i * 1) - 1), 0, "0");
+        input_string = input_string.splice(i * -7 - (i * 1 - 1), 0, '0');
       }
       return input_string;
     };
@@ -78,7 +78,7 @@ try {
 
     this.open = function() {
       board.transport.open();
-    }
+    };
 
     this.queryFirmware = () => {
       const res = new Promise((resolve, reject) => {
@@ -91,11 +91,12 @@ try {
           }
         }, 10000);
 
-        board.on("queryfirmware", () => {
+        board.on('queryfirmware', () => {
           data = {
             firmataName: board.firmware.name,
-            firmataVersion: board.firmware.version.major + "." + board.firmware.version.minor,
-            implementationVersion: ''
+            firmataVersion:
+              board.firmware.version.major + '.' + board.firmware.version.minor,
+            implementationVersion: '',
           };
           debug('queryfirmware completed');
 
@@ -104,25 +105,26 @@ try {
             debug('got sysex response');
             clearTimeout(timeout);
 
-            const balenaVersion = String.fromCharCode.apply(null, Firmata.decode(resp));
+            const balenaVersion = String.fromCharCode.apply(
+              null,
+              Firmata.decode(resp),
+            );
             debug(`Balena Firmata Version: ${balenaVersion}`);
             data.implementationVersion = balenaVersion;
             resolve(data);
 
             board.clearSysexResponse(balenaSysex);
-          })
+          });
           debug('sending sysex command');
           board.sysexCommand([balenaSysex, balenaSysexSubCommandFirmware]);
         });
       });
       debug('Calling queryfirmware');
-      board.queryFirmware(() => { });
+      board.queryFirmware(() => {});
       return res;
     };
-
   };
   module.exports = firmata();
-}
-catch (error) {
+} catch (error) {
   console.error(error);
 }

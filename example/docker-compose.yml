@@ -2,9 +2,9 @@ version: "2.1"
 volumes:
   fin:
 services:
-  finabler:
+  fin-block:
     restart: always
-    image: balenablocks/finabler:latest
+    image: balenablocks/fin-block:latest
     network_mode: host
     privileged: true
     volumes:

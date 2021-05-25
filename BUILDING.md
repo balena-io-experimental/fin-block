@@ -5,7 +5,9 @@
 ```
 npm run docker-dev
 ```
+
 If you want to push this to your application:
+
 ```
 npm run balena --app=${your_application}
 ```
@@ -13,11 +15,13 @@ npm run balena --app=${your_application}
 # Building for release
 
 ## Build with buildx
+
 ```
-docker buildx build -t balenablocks/finabler:latest --platform linux/arm/v7 --file Dockerfile.template .
+docker buildx build -t balenablocks/fin-block:latest --platform linux/arm/v7 --file Dockerfile.template .
 ```
 
 ## Push to the repo
+
 ```
-docker push balenablocks/finabler:latest
+docker push balenablocks/fin-block:latest
 ```

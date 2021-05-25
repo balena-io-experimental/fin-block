@@ -1,4 +1,4 @@
-name: finabler
+name: fin-block
 description: >-
   Provides a simple interface for controlling the balenaFin's coprocessor
   running the firmata protocol.
@@ -8,11 +8,11 @@ assets:
   repository:
     type: blob.asset
     data:
-      url: 'https://github.com/balenablocks/finabler'
+      url: "https://github.com/balenablocks/fin-block"
   logo:
     type: blob.asset
     data:
-      url: 'https://raw.githubusercontent.com/balenablocks/finabler/main/logo.png'
+      url: "https://raw.githubusercontent.com/balenablocks/fin-block/main/logo.png"
 data:
   defaultDeviceType: fincm3
   supportedDeviceTypes:

@@ -1,7 +1,7 @@
-# finabler
+# fin-block
 
 Provides a simple interface for controlling the balenaFin's coprocessor running the firmata protocol.
-The `finabler` block is a docker image that provides flashing utilities, status tagging, sleep control and firmata control functionality.
+The `fin-block` block is a docker image that provides flashing utilities, status tagging, sleep control and firmata control functionality.
 
 ## Features
 
@@ -18,20 +18,20 @@ The `finabler` block is a docker image that provides flashing utilities, status 
 Add the following to your `docker-compose`:
 
 ```yaml
-version: '2.1'
+version: "2.1"
 volumes:
-    fin:
+  fin:
 services:
-  finabler:
+  fin-block:
     restart: always
-    image: balenablocks/finabler:latest
+    image: balenablocks/fin-block:latest
     network_mode: host
     privileged: true
     volumes:
-      - 'fin:/data/firmware'
+      - "fin:/data/firmware"
     labels:
-      io.balena.features.supervisor-api: '1'
-      io.balena.features.balena-api: '1'
+      io.balena.features.supervisor-api: "1"
+      io.balena.features.balena-api: "1"
     expose:
       - "1337"
 ```
@@ -48,11 +48,12 @@ For example, sending the balenaFin to sleep for 1 minute with a 10 second delay,
 ```bash
 curl -X POST localhost:1337/sleep/10/60
 ```
+
 #### [GET] `/ping`
 
-Used to know the block is ready to recieve instructions.
+Used to know the block is ready to receive instructions.
 
-*note: this will be expanded to return HTTP unavailable when the device is flashing or about to reboot*
+_note: this will be expanded to return HTTP unavailable when the device is flashing or about to reboot_
 
 #### [GET] `/firmware`
 
@@ -61,14 +62,16 @@ Retrieves the firmata implementation version.
 #### [POST] `/sleep/${int:delay}/${int:timeout}`
 
 triggers the balenaFin power saving mode.
+
 - `delay` (integer): length of time (seconds) the coprocessor will wait before forcefully shutting down the compute module
-- `timeout` (integer): length of time (seconds) the coprocessor will keep the compute module shut down before powering it back on. 
-There is a limit of 97 years (3,058,992,000 seconds) as the max value the coprocessor can handle.
+- `timeout` (integer): length of time (seconds) the coprocessor will keep the compute module shut down before powering it back on.
+  There is a limit of 97 years (3,058,992,000 seconds) as the max value the coprocessor can handle.
 - You can override update checks that would otherwise prevent the sleep from being triggered passing `force` in the body of the request: `{"force":1}`
 
 #### [POST] `/set/${int:pin}/${int:state}`
 
 set digital pin state on the coprocessor header.
+
 - `pin` (integer): `Expansion Header` pin numbering as referred to [here](https://github.com/balena-io/balena-fin-coprocessor-firmata#firmata-pin-map).
 - `state` (integer): is either 1 (on) or 0 (off)
 

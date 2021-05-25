@@ -3,3 +3,5 @@ app/node_modules
 dist
 *.hex
 node_modules
+build
+docs

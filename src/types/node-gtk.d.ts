@@ -1,1 +1,1 @@
-declare module 'node-gtk';
+declare module "node-gtk";

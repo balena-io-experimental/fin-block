@@ -44,14 +44,17 @@
     "compression": "^1.7.4",
     "dateformat": "^3.0.3",
     "debug": "^4.1.1",
+    "download": "^8.0.0",
     "express": "^4.17.1",
     "firmata": "^2.2.0",
+    "lockfile": "^1.0.4",
     "lodash": "^4.17.15",
     "node-gtk": "^0.4.0",
     "onoff": "^6.0.0",
     "request": "^2.88.2",
     "promise-request-retry": "^1.0.1",
     "semver-compare": "^1.0.0",
-    "serialport": "^9.0.0"
+    "serialport": "^9.0.0",
+    "sleep-promise": "^8.0.1"
   }
 }

@@ -56,6 +56,22 @@ class FirmataModule {
     board.sysexCommand(this.configSleep(delay, time));
   };
 
+  async setPin(pin, state) {
+    board.digitalWrite(pin, state);
+  };
+
+  async getPin(pin) {
+    board.digitalRead(pin);
+  };
+
+  async close() {
+    board.transport.close();
+  };
+
+  async open() {
+    board.transport.open();
+  }
+
   padData(input_string) {
     for (var i = 1; i < 6; i++) {
       input_string = input_string.splice((i * -7) - ((i * 1) - 1), 0, "0");

@@ -9,9 +9,13 @@ module.exports = class eeprom {
 
     async info() {
         let data = {};
-        data.revision = await fin.revision;
-        data.uid = await fin.uid;
-        data.eeprom = await fin.eeprom;
-        return data;
+        try {
+            data.revision = await fin.revision;
+            data.uid = await fin.uid;
+            data.eeprom = await fin.eeprom;
+            return data;
+        } catch (error) {
+            throw error;
+        }
     }
 }

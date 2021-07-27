@@ -84,6 +84,7 @@ if (constants.AUTOFLASH) {
   flashFirmwareIfNeeded().then((flashResult) => {
     debug(`firmware ${flashResult.version} flashed or already running. needsReboot is ${flashResult.needsReboot}`);
     if (flashResult.needsReboot) {
+      debug(`rebooting`);
       supervisor.reboot();
     }
   }).catch((error) => {

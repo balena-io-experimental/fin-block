@@ -83,12 +83,11 @@ module.exports = class supervisor {
     };
     return rp(options)
       .then((response) => {
-        debug(response.status);
-        debug(response.appState);
+        debug(`supervisor returned device status ${response.status} and app state ${response.appState}`);
         if (response.status === "success" && response.appState === "applied") {
-          return true;
+          return false;
         } else {
-          return false
+          return true
         }
       }).catch((e) => {
         throw (e);

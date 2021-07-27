@@ -10,24 +10,25 @@ String.prototype.splice = function (idx, rem, str) {
   return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
 };
 
-module.exports = class firmata {
-
+class FirmataModule {
   async getVersion() {
     const res = new Promise((resolve, reject) => {
-      let data;
+      let data = {
+        firmataName: '',
+        firmataVersion: '',
+        implementationVersion: ''
+      };
       const timeout = setTimeout(() => {
-        if (!data) {
+        if (data.firmwareName === '' || data.firmataVersion === '' || data.implementationVersion === '') {
           board.clearSysexResponse(balenaSysex);
-          reject(new Error('firmware metadata cannot be obtained'));
+          debug('firmware metadata cannot be obtained');
+          resolve(data);
         }
       }, 10000);
-
       board.once("queryfirmware", () => {
-        data = {
-          firmataName: board.firmware.name,
-          firmataVersion: board.firmware.version.major + "." + board.firmware.version.minor,
-          implementationVersion: ''
-        };
+        data.firmataName = board.firmware.name;
+        data.firmataVersion = board.firmware.version.major + "." + board.firmware.version.minor;
+        data.implementationVersion = '';
         debug('queryfirmware completed');
 
         board.clearSysexResponse(balenaSysex);
@@ -51,8 +52,8 @@ module.exports = class firmata {
     return res;
   }
 
-  async sleep(delay, timeout) {
-    board.sysexCommand(this.configSleep(delay, timeout));
+  async sleep(delay, time) {
+    board.sysexCommand(this.configSleep(delay, time));
   };
 
   padData(input_string) {
@@ -86,3 +87,5 @@ module.exports = class firmata {
   };
 
 }
+
+module.exports = new FirmataModule();

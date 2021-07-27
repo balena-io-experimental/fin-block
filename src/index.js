@@ -3,14 +3,14 @@
 const debug = require('debug')('main');
 const Constants = require(__dirname + '/utils/constants');
 const constants = new Constants();
-const Firmata = require(__dirname + '/utils/firmata/index.js');
-const Flasher = require(__dirname + '/utils/flasher/index.js');
 const Supervisor = require(__dirname + '/utils/supervisor/index.js');
 const Downloader = require(__dirname + '/utils/downloader/index.js');
-const firmata = new Firmata();
-const flasher = new Flasher();
+const Eeprom = require(__dirname + '/utils/eeprom/index.js');
+const firmata = require(__dirname + '/utils/firmata/index.js');
+const flasher = require(__dirname + '/utils/flasher/index.js');
 const supervisor = new Supervisor();
 const downloader = new Downloader();
+const eeprom = new Eeprom();
 const express = require('express');
 const compression = require('compression');
 const bodyParser = require("body-parser");
@@ -35,7 +35,7 @@ app.use(function (req, res, next) {
 });
 app.use(errorHandler);
 
-app.get('/v1/firmware', async (req, res) => {
+app.get('/firmware', async (req, res) => {
   try {
     const fw = await firmata.getVersion();
     return res.status(200).send(fw);
@@ -44,20 +44,26 @@ app.get('/v1/firmware', async (req, res) => {
   }
 });
 
-app.post('/v1/firmware', async (req, res) => {
+app.get('/eeprom', async (req, res) => {
   try {
-    await supervisor.updateLock();
-    const flashResult = await flasher.flash(req.body.firmwareFile || constants.FIRMWARE_FILE, req.body.bootloaderFile || constants.BOOTLOADER_FILE);
-    supervisor.updateUnlock();
-    await supervisor.reboot();
-    return res.status(200).send(flashResult);
+    const data = await eeprom.info();
+    return res.status(200).send(data);
   } catch (error) {
-    supervisor.updateUnlock();
     return res.status(500).send(error.message);
   }
 });
 
-app.post('/v1/sleep', async (req, res) => {
+app.post('/firmware', async (req, res) => {
+  try {
+    await flash(req.body.firmwareFile || constants.FIRMWARE_PATH, req.body.bootloaderFile || constants.BOOTLOADER_FILE, constants.OPENOCD_DEBUG_LEVEL);
+    await supervisor.reboot();
+    return res.status(200).send("OK");
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+});
+
+app.post('/sleep', async (req, res) => {
   if (!req.body.sleepTime || !req.body.sleepDelay) {
     return res.status(400).send("request is missing sleep time and/or sleep delay parameter");
   }
@@ -67,11 +73,58 @@ app.post('/v1/sleep', async (req, res) => {
     if (updating && !req.body.force) {
       return res.status(409).send("device is updating, cannot sleep now unless force parameter is set true");
     }
-    const sleepResult = await firmata.sleep(req.body.sleepTime,req.body.sleepDelay);
-    return res.status(200).send(sleepResult);
+    await firmata.sleep(req.body.sleepDelay, req.body.sleepTime);
+    return res.status(200).send("OK");
   } catch (error) {
     return res.status(500).send(error.message);
   }
 });
 
+if (constants.AUTOFLASH) {
+  flashFirmwareIfNeeded().then((flashResult) => {
+    debug(`firmware ${flashResult.version} flashed or already running. needsReboot is ${flashResult.needsReboot}`);
+    if (flashResult.needsReboot) {
+      supervisor.reboot();
+    }
+  }).catch((error) => {
+    debug(error);
+  });
+}
+
 app.listen(constants.PORT);
+
+async function flashFirmwareIfNeeded() {
+  try {
+    const firmwareData = await firmata.getVersion();
+    debug(`running firmata implementation version: ${firmwareData.implementationVersion}`);
+    if (firmwareData.implementationVersion === `v${constants.FIRMWARE_VERSION}`) {
+      debug(`target firmware already running, skipping flash...`);
+      return {
+        version: constants.FIRMWARE_VERSION,
+        needsReboot: false
+      }
+    } else {
+      debug(`target firmware is not already running, downloading it for flashing...`);
+      await downloader.downloadFirmware(constants.FIRMWARE_URL, constants.FIRMWARE_PATH, constants.FIRMWARE_NAME);
+      debug(`target firmware downloaded, starting flash...`);
+      await flash(constants.FIRMWARE_PATH, constants.BOOTLOADER_FILE);
+      return {
+        version: constants.FIRMWARE_VERSION,
+        needsReboot: true
+      }
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function flash(firmwareFile, bootloaderFile) {
+  try {
+    await supervisor.updateLock();
+    await flasher.flash(firmwareFile, bootloaderFile, constants.OPENOCD_DEBUG_LEVEL);
+    return await supervisor.updateUnlock();
+  } catch (error) {
+    await supervisor.updateUnlock();
+    throw error;
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "finabler",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "balenaBlock that provides a simple interface for controlling the balenaFin's coprocessor running the firmata protocol.",
   "main": "index.js",
   "scripts": {

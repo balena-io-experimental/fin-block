@@ -75,12 +75,19 @@ app.post('/sleep', async (req, res) => {
     if (updating && !req.body.force) {
       return res.status(409).send("device is updating, cannot sleep now unless force parameter is set true");
     }
+    const wakeupEta = calculateWakeupEta(req.body.sleepTime,req.body.sleepDelay);
+    cloud.tag('fin-status', 'sleeping');
+    cloud.tag('wake-eta', wakeupEta);
     await firmata.sleep(req.body.sleepDelay, req.body.sleepTime);
+    supervisor.shutdown();
     return res.status(200).send("OK");
   } catch (error) {
     return res.status(500).send(error.message);
   }
 });
+
+
+cloud.tag('fin-status', 'awake');
 
 if (constants.AUTOFLASH) {
   flashFirmwareIfNeeded().then((flashResult) => {
@@ -110,7 +117,9 @@ async function flashFirmwareIfNeeded() {
       debug(`target firmware is not already running, downloading it for flashing...`);
       await downloader.downloadFirmware(constants.FIRMWARE_URL, constants.FIRMWARE_PATH, constants.FIRMWARE_NAME);
       debug(`target firmware downloaded, starting flash...`);
+      cloud.tag('fin-status', 'flashing');
       await flash(constants.FIRMWARE_PATH, constants.BOOTLOADER_FILE);
+      cloud.tag('fin-status', 'awake');
       return {
         version: constants.FIRMWARE_VERSION,
         needsReboot: true
@@ -130,4 +139,10 @@ async function flash(firmwareFile, bootloaderFile) {
     await supervisor.updateUnlock();
     throw error;
   }
+}
+
+async function calculateWakeupEta(sleepTime,sleepDelay) {
+  const currentDate = new Date();
+  const wakeupDate = new Date(currentDate.getTime() + (1000 * sleepTime) + (1000 * sleepDelay));
+  return dateFormat(wakeupDate, "isoDateTime");
 }

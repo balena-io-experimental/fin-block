@@ -1,6 +1,7 @@
 #!/bin/env node
 
 const debug = require('debug')('main');
+const dateFormat = require('dateformat');
 const Constants = require(__dirname + '/utils/constants');
 const constants = new Constants();
 const Supervisor = require(__dirname + '/utils/supervisor/index.js');

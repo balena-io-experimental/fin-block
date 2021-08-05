@@ -53,24 +53,28 @@ class FirmataModule {
   }
 
   async sleep(delay, time) {
-    board.sysexCommand(this.configSleep(delay, time));
+    try {
+      return await board.sysexCommand(this.configSleep(delay, time));
+    } catch (error) {
+      throw(error);
+    }
   };
 
   async setPin(pin, state) {
-    board.digitalWrite(pin, state);
+    try {
+      return await board.digitalWrite(pin, state);
+    } catch (error) {
+      throw(error);
+    }
   };
 
   async getPin(pin) {
-    board.digitalRead(pin);
+    try {
+      return await board.digitalRead(pin);
+    } catch (error) {
+      throw(error);
+    }
   };
-
-  async close() {
-    board.transport.close();
-  };
-
-  async open() {
-    board.transport.open();
-  }
 
   padData(input_string) {
     for (var i = 1; i < 6; i++) {

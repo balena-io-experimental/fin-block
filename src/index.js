@@ -47,20 +47,20 @@ app.get('/firmware', async (req, res) => {
   }
 });
 
-app.get('/eeprom', async (req, res) => {
-  try {
-    const data = await eeprom.info();
-    return res.status(200).send(data);
-  } catch (error) {
-    return res.status(500).send(error.message);
-  }
-});
-
 app.post('/firmware', async (req, res) => {
   try {
     await flash(req.body.firmwareFile || constants.FIRMWARE_PATH, req.body.bootloaderFile || constants.BOOTLOADER_FILE, constants.OPENOCD_DEBUG_LEVEL);
     await supervisor.reboot();
     return res.status(200).send("OK");
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+});
+
+app.get('/eeprom', async (req, res) => {
+  try {
+    const data = await eeprom.info();
+    return res.status(200).send(data);
   } catch (error) {
     return res.status(500).send(error.message);
   }
@@ -76,7 +76,7 @@ app.post('/sleep', async (req, res) => {
     if (updating && !req.body.force) {
       return res.status(409).send("device is updating, cannot sleep now unless force parameter is set true");
     }
-    const wakeupEta = calculateWakeupEta(req.body.sleepTime,req.body.sleepDelay);
+    const wakeupEta = await calculateWakeupEta(req.body.sleepTime,req.body.sleepDelay);
     cloud.tag('fin-status', 'sleeping');
     cloud.tag('wake-eta', wakeupEta);
     await firmata.sleep(req.body.sleepDelay, req.body.sleepTime);
@@ -87,10 +87,40 @@ app.post('/sleep', async (req, res) => {
   }
 });
 
+app.post('/pin', async (req, res) => {
+  if (!req.body.pin) {
+    return res.status(400).send("request is missing pin and/or state parameter");
+  }
+  try {
+    await firmata.setPin(req.body.pin);
+    return res.status(200).send("OK");
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+});
+
+app.get('/pin', async (req, res) => {
+  if (!req.body.pin) {
+    return res.status(400).send("request is missing pin parameter");
+  }
+  try {
+    const pinState = await firmata.getPin(req.body.pin);
+    const data = {
+      pin: req.body.pin,
+      state: pinState
+    }
+    return res.status(200).send(data);
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+});
+
 
 cloud.tag('fin-status', 'awake');
+cloud.tag('wake-eta', 'N/A');
 
 if (constants.AUTOFLASH) {
+  debug(`autoflash is set to ${constants.AUTOFLASH}`);
   flashFirmwareIfNeeded().then((flashResult) => {
     debug(`firmware ${flashResult.version} flashed or already running. needsReboot is ${flashResult.needsReboot}`);
     if (flashResult.needsReboot) {
@@ -145,5 +175,7 @@ async function flash(firmwareFile, bootloaderFile) {
 async function calculateWakeupEta(sleepTime,sleepDelay) {
   const currentDate = new Date();
   const wakeupDate = new Date(currentDate.getTime() + (1000 * sleepTime) + (1000 * sleepDelay));
-  return dateFormat(wakeupDate, "isoDateTime");
+  const wakeupDateFormatted = await dateFormat(wakeupDate, "isoDateTime");
+  debug(`wakeup eta calculated: ${wakeupDateFormatted}`);
+  return wakeupDateFormatted;
 }

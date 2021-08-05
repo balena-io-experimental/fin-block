@@ -4,6 +4,7 @@ const { getSdk } = require('balena-sdk');
 const sdk = getSdk();
 const BALENA_API_KEY = process.env.BALENA_API_KEY;
 const BALENA_DEVICE_UUID = process.env.BALENA_DEVICE_UUID;
+const debug = require('debug')('cloud');
 module.exports = class BalenaCloud {
 
     async tag(name, value) {

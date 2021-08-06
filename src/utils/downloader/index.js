@@ -7,15 +7,22 @@ const debug = require('debug')('downloader');
 
 module.exports = class downloader {
 
-    async downloadFirmware(url,path,name) {
-        if (fs.existsSync(path)) {
-            debug(`${path} exists already, skipping download...`);
-        } else {
-            return await download(url, path, {
-                filename: name,
-                decompress: true
-            });
+    async downloadFirmware(version, url, folder) {
+        const downloadUrl = `${url}v${version}/firmata.hex`;
+        const destination = `${folder}firmata-v${version}.hex`;
+        debug(`downloading firmware file ${downloadUrl} as file ${destination}`);
+            try {
+                if (fs.existsSync(destination)) {
+                    debug(`${destination} exists already, skipping download...`);
+                } else {
+                    await download(downloadUrl, folder, {
+                        filename: `firmata-v${version}.hex`,
+                        decompress: true
+                    });
+                }
+                return destination;
+            } catch (error) {
+                throw error;
+            }
         }
-    }
-
 };

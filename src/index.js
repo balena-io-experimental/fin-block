@@ -146,10 +146,10 @@ async function flashFirmwareIfNeeded() {
       }
     } else {
       debug(`target firmware is not already running, downloading it for flashing...`);
-      await downloader.downloadFirmware(constants.FIRMWARE_URL, constants.FIRMWARE_PATH, constants.FIRMWARE_NAME);
+      const firmwareFile = await downloader.downloadFirmware(constants.FIRMWARE_VERSION, constants.FIRMWARE_URL, constants.FIRMWARE_FOLDER);
       debug(`target firmware downloaded, starting flash...`);
       cloud.tag('fin-status', 'flashing');
-      await flash(constants.FIRMWARE_PATH, constants.BOOTLOADER_FILE);
+      await flash(firmwareFile, constants.BOOTLOADER_FILE);
       cloud.tag('fin-status', 'awake');
       return {
         version: constants.FIRMWARE_VERSION,

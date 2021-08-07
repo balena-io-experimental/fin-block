@@ -76,9 +76,9 @@ app.post('/sleep', async (req, res) => {
     if (updating && !req.body.force) {
       return res.status(409).send("device is updating, cannot sleep now unless force parameter is set true");
     }
-    const wakeupEta = await calculateWakeupEta(req.body.sleepTime,req.body.sleepDelay);
-    cloud.tag('fin-status', 'sleeping');
-    cloud.tag('wake-eta', wakeupEta);
+    const wakeupEta = await calculateWakeupEta(req.body.sleepTime, req.body.sleepDelay);
+    cloud.tag('balenafin-status', 'sleeping');
+    cloud.tag('balenafin-wake-eta', wakeupEta);
     await firmata.sleep(req.body.sleepDelay, req.body.sleepTime);
     supervisor.shutdown();
     return res.status(200).send("OK");
@@ -116,13 +116,13 @@ app.get('/pin', async (req, res) => {
 });
 
 
-cloud.tag('fin-status', 'awake');
-cloud.tag('wake-eta', 'N/A');
+cloud.tag('balenafin-status', 'awake');
+cloud.tag('balenafin-wake-eta', 'N/A');
 
 if (constants.AUTOFLASH) {
   debug(`autoflash is set to ${constants.AUTOFLASH}`);
   flashFirmwareIfNeeded().then((flashResult) => {
-    debug(`firmware ${flashResult.version} flashed or already running. needsReboot is ${flashResult.needsReboot}`);
+    debug(`firmware ${flashResult.version} ${flashResult.needsReboot ? "flashed" : "already running"}. needsReboot is ${flashResult.needsReboot}`);
     if (flashResult.needsReboot) {
       debug(`rebooting`);
       supervisor.reboot();
@@ -138,21 +138,22 @@ async function flashFirmwareIfNeeded() {
   try {
     const firmwareData = await firmata.getVersion();
     debug(`running firmata implementation version: ${firmwareData.implementationVersion}`);
-    if (firmwareData.implementationVersion === `v${constants.FIRMWARE_VERSION}`) {
-      debug(`target firmware already running, skipping flash...`);
+    cloud.tag('balenafin-firmata-version', firmwareData.implementationVersion);
+    const targetVersion = (constants.FIRMWARE_VERSION === "latest" ? await downloader.getlatestFirmwareVersion() : constants.FIRMWARE_VERSION);
+    if (firmwareData.implementationVersion === `v${targetVersion}`) {
       return {
-        version: constants.FIRMWARE_VERSION,
+        version: targetVersion,
         needsReboot: false
       }
     } else {
-      debug(`target firmware is not already running, downloading it for flashing...`);
+      debug(`target firmware ${targetVersion} is not already running, downloading it for flashing...`);
       const firmwareFile = await downloader.downloadFirmware(constants.FIRMWARE_VERSION, constants.FIRMWARE_URL, constants.FIRMWARE_FOLDER);
       debug(`target firmware downloaded, starting flash...`);
-      cloud.tag('fin-status', 'flashing');
+      cloud.tag('balenafin-status', 'flashing');
       await flash(firmwareFile, constants.BOOTLOADER_FILE);
-      cloud.tag('fin-status', 'awake');
+      cloud.tag('balenafin-status', 'awake');
       return {
-        version: constants.FIRMWARE_VERSION,
+        version: targetVersion,
         needsReboot: true
       }
     }
@@ -172,7 +173,7 @@ async function flash(firmwareFile, bootloaderFile) {
   }
 }
 
-async function calculateWakeupEta(sleepTime,sleepDelay) {
+async function calculateWakeupEta(sleepTime, sleepDelay) {
   const currentDate = new Date();
   const wakeupDate = new Date(currentDate.getTime() + (1000 * sleepTime) + (1000 * sleepDelay));
   const wakeupDateFormatted = await dateFormat(wakeupDate, "isoDateTime");

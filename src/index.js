@@ -161,8 +161,12 @@ async function flashFirmwareIfNeeded() {
       debug(`target firmware ${targetVersion} is not already running, downloading it for flashing...`);
       const firmwareFile = await downloader.downloadFirmware(constants.FIRMWARE_VERSION, constants.FIRMWARE_URL, constants.FIRMWARE_FOLDER);
       debug(`target firmware downloaded, starting flash...`);
+      const balenaFinSerial = eeprom.readSerial();
+      debug(`balenaFin HW revision is ${balenaFinSerial.hardwareRevision}`);
+      const balenaFinVersion = await eeprom.convertHardwareRevisionToVersion(balenaFinSerial.hardwareRevision);
+      debug(`balenaFin version is ${balenaFinVersion}`);
       cloud.tag('balenafin-status', 'flashing');
-      await flash(firmwareFile, constants.BOOTLOADER_FILE);
+      await flash(balenaFinSerial.hardwareRevision, firmwareFile, constants.BOOTLOADER_FILE);
       cloud.tag('balenafin-status', 'awake');
       return {
         version: targetVersion,
@@ -174,10 +178,10 @@ async function flashFirmwareIfNeeded() {
   }
 }
 
-async function flash(firmwareFile, bootloaderFile) {
+async function flash(hwRev,firmwareFile, bootloaderFile) {
   try {
     await supervisor.updateLock();
-    await flasher.flash(firmwareFile, bootloaderFile, constants.OPENOCD_DEBUG_LEVEL);
+    await flasher.flash(hwRev, firmwareFile, bootloaderFile, constants.OPENOCD_DEBUG_LEVEL);
     return await supervisor.updateUnlock();
   } catch (error) {
     await supervisor.updateUnlock();

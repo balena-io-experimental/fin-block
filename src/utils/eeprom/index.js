@@ -75,4 +75,18 @@ module.exports = class eeprom {
                 throw new Error(`bad serial: ${serial}`);
         }
     }
+
+    async convertRevisionToVersion(hardwareRevision) {
+        switch (hardwareRevision) {
+            case 09:
+                return "1.0.0"
+            case 10:
+                return "1.1.0"
+            case 11:
+                return "1.1.1"
+            default:
+                throw new Error(`hardware revision ${hardwareRevision} unknown, cannot convert to version`);
+        }
+
+    }
 }

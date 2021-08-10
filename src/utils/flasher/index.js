@@ -5,12 +5,12 @@ const Gpio = require('onoff').Gpio;
 const mux = new Gpio(41, 'out');
 const fs = require('fs');
 const fsPromises = require('fs').promises;
-const spawn = require('child_process').spawn;
+const {exec, spawn} = require('child_process').spawn;
 const sleep = require('sleep-promise');
 let flashingState = 0;
 
 class Flasher {
-  async flash(fw_file, bl_file, verbosity) {
+  async flash(hwRev, fw_file, bl_file, verbosity) {
     debug(`attempting to flash firmware: ${fw_file} with bootloader: ${bl_file}`);
     debug(`flashing state: ${flashingState}`);
     if (flashingState) {
@@ -28,7 +28,12 @@ class Flasher {
     await sleep(1000);
     try {
       debug(`spawning openocd process with debug level set to ${verbosity}...`);
-      const openocd = spawn(`openocd`, [`-d${verbosity}`,'-f', 'board/balena-fin/balena-fin-v1-1.cfg']);
+      const openocdConfig = hwRev === 09 ? 'board/balena-fin/balena-fin-v1-0.cfg' : 'board/balena-fin/balena-fin-v1-1.cfg'
+      if (hwRev === 09) {
+        exec(`ftdi_eeprom --flash-eeprom /usr/src/app/openocd/config/balena-fin-v1.0-jtag.conf`);
+        sleep(1000);
+      }
+      const openocd = spawn(`openocd`, [`-d${verbosity}`, '-f', openocdConfig]);
       openocd.on('close', (code) => {
         debug(`openocd child process exited with code ${code}`);
       });

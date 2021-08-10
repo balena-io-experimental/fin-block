@@ -29,7 +29,7 @@ module.exports = class BalenaCloud {
             } else {
                 debug(`dtoverlay settings do not match requirements`);
             }
-            if (coreFreq.contains("250")) {
+            if (coreFreq === "250") {
                 debug(`core_freq settings already match requirements`);
             } else {
                 debug(`core_freq settings do not match requirements`);

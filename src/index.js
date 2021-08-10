@@ -66,6 +66,18 @@ app.get('/eeprom', async (req, res) => {
   }
 });
 
+app.post('/eeprom', async (req, res) => {
+  if (!req.body.serial) {
+    return res.status(400).send("request is missing serial parameter");
+  }
+  try {
+    const data = await eeprom.writeSerial(req.body.serial);
+    return res.status(200).send(data);
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+});
+
 app.post('/sleep', async (req, res) => {
   if (!req.body.sleepTime || !req.body.sleepDelay) {
     return res.status(400).send("request is missing sleep time and/or sleep delay parameter");

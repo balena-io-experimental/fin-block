@@ -32,7 +32,8 @@ RUN install_packages \
     screen \
     telnet \
     jq \
-    libgirepository1.0-dev
+    libgirepository1.0-dev \
+    ethtool
 
 # install openocd
 RUN mkdir openocd && cd openocd && curl -Ls https://github.com/balena-io/balena-fin-openocd/releases/download/v${BALENA_OPENOCD_VERSION}/openocd.tar.gz | tar -xvz -C . \

@@ -5,7 +5,7 @@ const Gpio = require('onoff').Gpio;
 const mux = new Gpio(41, 'out');
 const fs = require('fs');
 const fsPromises = require('fs').promises;
-const {exec, spawn} = require('child_process').spawn;
+const {exec, spawn} = require('child_process');
 const sleep = require('sleep-promise');
 let flashingState = 0;
 
@@ -28,8 +28,8 @@ class Flasher {
     await sleep(1000);
     try {
       debug(`spawning openocd process with debug level set to ${verbosity}...`);
-      const openocdConfig = hwRev === 09 ? 'board/balena-fin/balena-fin-v1-0.cfg' : 'board/balena-fin/balena-fin-v1-1.cfg'
-      if (hwRev === 09) {
+      const openocdConfig = hwRev === 9 ? 'board/balena-fin/balena-fin-v1-0.cfg' : 'board/balena-fin/balena-fin-v1-1.cfg'
+      if (hwRev === 9) {
         exec(`ftdi_eeprom --flash-eeprom /usr/src/app/openocd/config/balena-fin-v1.0-jtag.conf`);
         sleep(1000);
       }

@@ -11,6 +11,7 @@ module.exports = class eeprom {
         try {
             const serial = await this.readSerial();
             const data = await this.parseSerial(serial);
+            debug(data);
             return data;
         } catch (error) {
             throw error;
@@ -78,7 +79,7 @@ module.exports = class eeprom {
 
     async convertRevisionToVersion(hardwareRevision) {
         switch (hardwareRevision) {
-            case 09:
+            case 9:
                 return "1.0.0"
             case 10:
                 return "1.1.0"

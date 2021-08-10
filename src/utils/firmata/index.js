@@ -1,9 +1,8 @@
 #!/bin/env node
 
 const debug = require('debug')('firmata');
-const SERIAL_PORT = process.env.SERIAL_PORT || "/dev/ttyS0"
 const Firmata = require("firmata");
-const board = new Firmata(SERIAL_PORT, { skipCapabilities: true });
+const eeprom = require('../eeprom/index.js');
 const balenaSysex = 0x0B;
 const balenaSysexSubCommandFirmware = 0x00;
 String.prototype.splice = function (idx, rem, str) {
@@ -11,6 +10,12 @@ String.prototype.splice = function (idx, rem, str) {
 };
 
 class FirmataModule {
+  constructor() {
+      const eepromData = eeprom.info();
+      this.hardwareRevision = eepromData.hardwareRevision;
+      this.SERIAL_PORT = this.hardwareRevision === 9 ? "/dev/ttyUSB0" : "/dev/ttyS0";
+      this.board = new Firmata(this.SERIAL_PORT, { skipCapabilities: true });
+  }
   async getVersion() {
     const res = new Promise((resolve, reject) => {
       let data = {
@@ -20,41 +25,40 @@ class FirmataModule {
       };
       const timeout = setTimeout(() => {
         if (data.firmwareName === '' || data.firmataVersion === '' || data.implementationVersion === '') {
-          board.clearSysexResponse(balenaSysex);
+          this.board.clearSysexResponse(balenaSysex);
           debug('firmware metadata cannot be obtained');
           resolve(data);
         }
       }, 10000);
-      board.once("queryfirmware", () => {
-        data.firmataName = board.firmware.name;
-        data.firmataVersion = board.firmware.version.major + "." + board.firmware.version.minor;
+      this.board.once("queryfirmware", () => {
+        data.firmataName = this.board.firmware.name;
+        data.firmataVersion = this.board.firmware.version.major + "." + this.board.firmware.version.minor;
         data.implementationVersion = '';
         debug('queryfirmware completed');
 
-        board.clearSysexResponse(balenaSysex);
-        board.sysexResponse(balenaSysex, resp => {
+        this.board.clearSysexResponse(balenaSysex);
+        this.board.sysexResponse(balenaSysex, resp => {
           debug('got sysex response');
           clearTimeout(timeout);
 
           const balenaVersion = String.fromCharCode.apply(null, Firmata.decode(resp));
           debug(`Balena Firmata Version: ${balenaVersion}`);
           data.implementationVersion = balenaVersion;
+          this.board.clearSysexResponse(balenaSysex);
           resolve(data);
-
-          board.clearSysexResponse(balenaSysex);
         })
         debug('sending sysex command');
-        board.sysexCommand([balenaSysex, balenaSysexSubCommandFirmware]);
+        this.board.sysexCommand([balenaSysex, balenaSysexSubCommandFirmware]);
       });
     });
     debug('Calling queryfirmware');
-    board.queryFirmware(() => { });
+    this.board.queryFirmware(() => { });
     return res;
   }
 
   async sleep(delay, time) {
     try {
-      return await board.sysexCommand(this.configSleep(delay, time));
+      return await this.board.sysexCommand(this.configSleep(delay, time));
     } catch (error) {
       throw(error);
     }
@@ -62,7 +66,7 @@ class FirmataModule {
 
   async setPin(pin, state) {
     try {
-      return await board.digitalWrite(pin, state);
+      return await this.board.digitalWrite(pin, state);
     } catch (error) {
       throw(error);
     }
@@ -70,7 +74,7 @@ class FirmataModule {
 
   async getPin(pin) {
     try {
-      return await board.digitalRead(pin);
+      return await this.board.digitalRead(pin);
     } catch (error) {
       throw(error);
     }

@@ -2,6 +2,7 @@
 
 const gi = require('node-gtk');
 const sleep = require('sleep-promise');
+const debug = require('debug')('eeprom');
 Fin = gi.require('Fin', '0.2')
 const fin = new Fin.Client()
 

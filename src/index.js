@@ -167,6 +167,12 @@ firmata.init().then(() => {
       debug(error);
     });
   }
+  if (constants.AUTOCONFIG) {
+    debug(`autoconfig is set to ${constants.AUTOCONFIG}`);
+    cloud.checkAndSetConfigVars().catch((error) => {
+      debug(error);
+    });
+  }
 }).catch((e) => {
   debug(e);
 });

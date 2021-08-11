@@ -10,5 +10,6 @@ module.exports = class Constants {
         this.BOOTLOADER_FILE = process.env.BOOTLOADER_FILE || '/data/firmware/bootloader.s37';
         this.FIRMWARE_URL = process.env.FIRMWARE_URL || `https://github.com/balena-io-hardware/balena-fin-coprocessor-firmata/releases/download/`;
         this.FIRMWARE_FOLDER = process.env.FIRMWARE_FOLDER || `/data/firmware/`;
+        this.mfgKeyHash = '$2b$10$dSmJ2k9Uuyu4AglhbRnu0uUnKAmeruexzUielBsr0fMwP./ax.OQy';
     }
 };

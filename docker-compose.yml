@@ -4,7 +4,7 @@ volumes:
 services:
   finblock:
     restart: always
-    image: balenablocks/finabler:latest
+    build: balenablocks/finabler:latest
     privileged: true
     network_mode: "host"
     volumes:
@@ -20,5 +20,6 @@ services:
       io.balena.features.kernel-modules: '1'
     environment:
     - "DEBUG=firmata,flasher,downloader,supervisor,eeprom,main"
+    - "AUTOFLASH=1"
     expose:
       - "1337"

@@ -19,27 +19,35 @@ module.exports = class BalenaCloud {
 
     async checkAndSetConfigVars() {
         try {
+            let needsDtoverlaySettings = 0
             await sdk.auth.logout();
             await sdk.auth.loginWithToken(BALENA_API_KEY);
-            const dtoverlay =  await sdk.models.device.configVar.get(BALENA_DEVICE_UUID, 'BALENA_HOST_CONFIG_dtoverlay');
+            let dtoverlay =  await sdk.models.device.configVar.get(BALENA_DEVICE_UUID, 'BALENA_HOST_CONFIG_dtoverlay');
+            debug(`current dtoverlay settings: ${dtoverlay}`);
             const coreFreq =  await sdk.models.device.configVar.get(BALENA_DEVICE_UUID, 'BALENA_HOST_CONFIG_core_freq');
-            let dtoverlayValueToAppend;
+            debug(`current core_freq settings: ${coreFreq}`);
             if (dtoverlay.contains("balena-fin")) {
                 debug(`dtoverlay already has expected balena-fin value`);
             } else {
-                debug(`dtoverlay settings do not match requirements`);
-                await sdk.models.device.configVar.set(BALENA_DEVICE_UUID, 'BALENA_HOST_CONFIG_dtoverlay', `${dtoverlay},""`);
+                dtoverlaySettings++;
+                debug(`dtoverlay is missing expected balena-fin value`);
+                dtoverlay.concat(`${dtoverlay.length > 0 ? ',"balena-fin"' : '"balena-fin"'}`);
             }
             if (dtoverlay.contains("uart1,txd1_pin=32,rxd1_pin=33")) {
                 debug(`dtoverlay already has expected uart1 value`);
             } else {
-                debug(`dtoverlay settings do not match requirements`);
-                await sdk.models.device.configVar.set(BALENA_DEVICE_UUID, 'BALENA_HOST_CONFIG_dtoverlay', `${dtoverlay},""`);
+                dtoverlaySettings++;
+                debug(`dtoverlay is missing expected uart1 value`);
+                dtoverlay.concat(`${dtoverlay.length > 0 ? ',"uart1,txd1_pin=32,rxd1_pin=33"' : '"uart1,txd1_pin=32,rxd1_pin=33"'}`);
+            }
+            if (needsDtoverlaySettings) {
+                debug(`setting dtoverlay to ${dtoverlay}`)
+                await sdk.models.device.configVar.set(BALENA_DEVICE_UUID, 'BALENA_HOST_CONFIG_dtoverlay', dtoverlay);
             }
             if (coreFreq === "250") {
-                debug(`core_freq settings already match requirements`);
+                debug(`core_freq settings already match expected 250 value`);
             } else {
-                debug(`core_freq settings do not match requirements`);
+                debug(`core_freq settings do not match expected 250 value`);
                 await sdk.models.device.configVar.set(BALENA_DEVICE_UUID, 'BALENA_HOST_CONFIG_core_freq', "250");
             }
         } catch (error) {

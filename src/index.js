@@ -4,11 +4,13 @@ const debug = require('debug')('main');
 const dateFormat = require('dateformat');
 const Constants = require(__dirname + '/utils/constants');
 const constants = new Constants();
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+const firmata = require(__dirname + '/utils/firmata/index.js');
 const Supervisor = require(__dirname + '/utils/supervisor/index.js');
 const Downloader = require(__dirname + '/utils/downloader/index.js');
 const BalenaCloud = require(__dirname + '/utils/balena-cloud/index.js');
 const eeprom = require(__dirname + '/utils/eeprom/index.js');
-const firmata = require(__dirname + '/utils/firmata/index.js');
 const flasher = require(__dirname + '/utils/flasher/index.js');
 const supervisor = new Supervisor();
 const downloader = new Downloader();
@@ -50,8 +52,10 @@ app.get('/firmware', async (req, res) => {
 
 app.post('/firmware', async (req, res) => {
   try {
-    debug(`firmware flash request received, flashing bootloader ${req.body.bootloaderFile || constants.BOOTLOADER_FILE} and firmware ${req.body.firmwareFile || constants.FIRMWARE_PATH} with openocd debug level set to ${constants.OPENOCD_DEBUG_LEVEL}`);
-    await flash(req.body.firmwareFile || constants.FIRMWARE_PATH, req.body.bootloaderFile || constants.BOOTLOADER_FILE, constants.OPENOCD_DEBUG_LEVEL);
+    const data = await eeprom.info();
+    debug(`firmware flash request received, flashing bootloader ${req.body.bootloaderFile || constants.BOOTLOADER_FILE} and firmware ${req.body.firmwareFile || constants.FIRMWARE_PATH}`);
+    cloud.tag('balenafin-status', 'flashing');
+    await flash(data.hardwareRevision, req.body.firmwareFile || constants.FIRMWARE_PATH, req.body.bootloaderFile || constants.BOOTLOADER_FILE);
     await supervisor.reboot();
     return res.status(200).send("OK");
   } catch (error) {
@@ -72,13 +76,19 @@ app.get('/eeprom', async (req, res) => {
 });
 
 app.post('/eeprom', async (req, res) => {
-  if (!req.body.serial) {
-    return res.status(400).send("request is missing serial parameter");
+  if (!req.body.serial || !req.body.mfgKey) {
+    return res.status(400).send("request is missing serial parameter or manufacturer key (writing reserved space on EEPROM requires manufacturing key)");
   }
   try {
-    debug(`eeprom flash request received, writing ${req.body.serial}`);
-    const data = await eeprom.writeSerial(req.body.serial);
-    return res.status(200).send(data);
+    const mfgCheck = await checkMfgKey(req.body.mfgKey);
+    if (mfgCheck) {
+      debug(`eeprom flash request received, writing ${req.body.serial}`);
+      const data = await eeprom.writeSerial(req.body.serial);
+      return res.status(200).send(data);
+    } else {
+      debug(`eeprom flash request received, but provided manufacturing key is not valid. Refusing...`);
+      return res.status(401).send(`provided manufacturing key is not valid`);
+    }
   } catch (error) {
     debug(error);
     return res.status(500).send(error.message);
@@ -144,19 +154,22 @@ app.get('/pin', async (req, res) => {
 
 cloud.tag('balenafin-status', 'awake');
 cloud.tag('balenafin-wake-eta', 'N/A');
-
-if (constants.AUTOFLASH) {
-  debug(`autoflash is set to ${constants.AUTOFLASH}`);
-  flashFirmwareIfNeeded().then((flashResult) => {
-    debug(`firmware ${flashResult.version} ${flashResult.needsReboot ? "flashed" : "already running"}. needsReboot is ${flashResult.needsReboot}`);
-    if (flashResult.needsReboot) {
-      debug(`rebooting`);
-      supervisor.reboot();
-    }
-  }).catch((error) => {
-    debug(error);
-  });
-}
+firmata.init().then(() => {
+  if (constants.AUTOFLASH) {
+    debug(`autoflash is set to ${constants.AUTOFLASH}`);
+    flashFirmwareIfNeeded().then((flashResult) => {
+      debug(`firmware ${flashResult.version} ${flashResult.needsReboot ? "flashed" : "already running"}. needsReboot is ${flashResult.needsReboot}`);
+      if (flashResult.needsReboot) {
+        debug(`rebooting`);
+        supervisor.reboot();
+      }
+    }).catch((error) => {
+      debug(error);
+    });
+  }
+}).catch((e) => {
+  debug(e);
+});
 
 app.listen(constants.PORT);
 
@@ -190,7 +203,7 @@ async function flashFirmwareIfNeeded() {
   }
 }
 
-async function flash(hwRev,firmwareFile, bootloaderFile) {
+async function flash(hwRev, firmwareFile, bootloaderFile) {
   try {
     await supervisor.updateLock();
     await flasher.flash(hwRev, firmwareFile, bootloaderFile, constants.OPENOCD_DEBUG_LEVEL);
@@ -207,4 +220,9 @@ async function calculateWakeupEta(sleepTime, sleepDelay) {
   const wakeupDateFormatted = await dateFormat(wakeupDate, "isoDateTime");
   debug(`wakeup eta calculated: ${wakeupDateFormatted}`);
   return wakeupDateFormatted;
+}
+
+async function checkMfgKey(key) {
+  const hashCheck = await bcrypt.compare(key, constants.mfgKeyHash);
+  return hashCheck;
 }

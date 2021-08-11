@@ -10,12 +10,15 @@ String.prototype.splice = function (idx, rem, str) {
 };
 
 class FirmataModule {
-  constructor() {
-      const eepromData = eeprom.info();
-      this.hardwareRevision = eepromData.hardwareRevision;
-      this.SERIAL_PORT = this.hardwareRevision === 9 ? "/dev/ttyUSB0" : "/dev/ttyS0";
-      this.board = new Firmata(this.SERIAL_PORT, { skipCapabilities: true });
+
+  async init() {
+    const eepromData = await eeprom.info();
+    this.hardwareRevision = eepromData.hardwareRevision;
+    this.SERIAL_PORT = this.hardwareRevision === 9 ? "/dev/ttyUSB0" : "/dev/ttyS0";
+    debug(`hardware revision is ${this.hardwareRevision} - connecting firmata over ${this.SERIAL_PORT}`);
+    this.board = new Firmata(this.SERIAL_PORT, { skipCapabilities: true });
   }
+
   async getVersion() {
     const res = new Promise((resolve, reject) => {
       let data = {
@@ -60,7 +63,7 @@ class FirmataModule {
     try {
       return await this.board.sysexCommand(this.configSleep(delay, time));
     } catch (error) {
-      throw(error);
+      throw (error);
     }
   };
 
@@ -68,7 +71,7 @@ class FirmataModule {
     try {
       return await this.board.digitalWrite(pin, state);
     } catch (error) {
-      throw(error);
+      throw (error);
     }
   };
 
@@ -76,7 +79,7 @@ class FirmataModule {
     try {
       return await this.board.digitalRead(pin);
     } catch (error) {
-      throw(error);
+      throw (error);
     }
   };
 

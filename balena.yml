@@ -2,7 +2,7 @@ name: finabler
 description: >-
   Provides a simple interface for controlling the balenaFin's coprocessor
   running the firmata protocol.
-version: 1.0.1
+version: 2.0.0
 type: sw.application
 assets:
   repository:

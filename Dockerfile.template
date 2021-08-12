@@ -1,56 +1,35 @@
 ARG NODEJS_VERSION="12"
 
-FROM balenalib/raspberrypi3-debian:stretch AS essentialsstep
-RUN install_packages \
-    build-essential
-
-WORKDIR /usr/src/bin
-COPY ./openocd/bin/flush.c .
-RUN gcc flush.c -o /usr/src/bin/flush
-
 ## buildstep base image
 FROM balenalib/fincm3-node:${NODEJS_VERSION}-build AS buildstep
-# install required packages
-RUN install_packages \
-    libgirepository1.0-dev
 
 WORKDIR /usr/src/app
 COPY ./package.json package.json
-COPY ./package-lock.json package-lock.json
 RUN JOBS=MAX npm install --unsafe-perm --production && npm cache clean --force
 
 ## target base image
 FROM balenalib/fincm3-node:${NODEJS_VERSION}-run
-ENV BALENA_OPENOCD_VERSION 0.1.1
+ENV BALENA_OPENOCD_VERSION 0.11.0+dev-g3d9534b-dirty
 ENV BALENA_FIN_SDK_VERSION 0.2.0
 
 WORKDIR /usr/src/app
 # gather compiled node modules from buildstep
 COPY --from=buildstep /usr/src/app/node_modules node_modules
-COPY --from=essentialsstep /usr/src/bin/flush flush
 
 # install required packages
 RUN install_packages \
     ftdi-eeprom \
     libftdi-dev \
-    screen \
     telnet \
-    jq \
-    libgirepository1.0-dev \
-    wget
+    ethtool
 
 # install openocd
 RUN mkdir openocd && cd openocd && curl -Ls https://github.com/balena-io/balena-fin-openocd/releases/download/v${BALENA_OPENOCD_VERSION}/openocd.tar.gz | tar -xvz -C . \
     && chmod +x install.sh && ./install.sh && cd /usr/src/app && rm -rf openocd
 
-# install the balenaFin sdk
-RUN curl -Ls https://github.com/balena-io/balena-fin-sdk/releases/download/v${BALENA_FIN_SDK_VERSION}/balena-fin-sdk-v${BALENA_FIN_SDK_VERSION}.tar.gz | tar -xvz -C . \
-    && mv Fin-0.2.typelib /usr/lib/arm-linux-gnueabihf/girepository-1.0/ && mv libfin.so /usr/lib/arm-linux-gnueabihf/
-
 # Move app to filesystem
 COPY ./src ./
 COPY ./openocd ./openocd
-RUN chmod +x flash.sh && chmod +x flush && chmod +x ./openocd/openocd-v1.0.sh && chmod +x ./openocd/openocd-v1.1.sh
 
 # Start app
 CMD ["bash", "/usr/src/app/start.sh"]

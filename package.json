@@ -1,11 +1,11 @@
 {
-  "name": "finabler",
+  "name": "fin",
   "version": "1.0.0",
   "description": "balenaBlock that provides a simple interface for controlling the balenaFin's coprocessor running the firmata protocol.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "docker-dev": "docker run -d -p 5000:5000 --restart=always --name registry registry:2 || true && docker buildx build -t localhost:5000/finabler:latest --platform linux/arm/v7 --file Dockerfile.template . && docker push localhost:5000/finabler:latest",
+    "docker-dev": "docker run -d -p 5000:5000 --restart=always --name registry registry:2 || true && docker buildx build -t localhost:5000/fin:latest --platform linux/arm/v7 --file Dockerfile.template . && docker push localhost:5000/fin:latest",
     "docker-release": "docker buildx build -t balenablocks/finabler:latest --platform linux/arm/v7 --file Dockerfile.template . && docker push balenablocks/finabler:latest",
     "balena": "balena deploy --build --source example/ $npm_config_app"
   },
@@ -13,6 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/balenablocks/finabler.git"
   },
+  "private": true,
   "keywords": [
     "balena",
     "fin",

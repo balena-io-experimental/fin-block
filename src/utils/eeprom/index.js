@@ -10,14 +10,16 @@ class Eeprom {
         try {
             const serial = await this.readSerial();
             const data = await this.parseSerial(serial);
-            if (!data.hardwareRevision && this.checkForFtdiChip()) {
+            const hasFtdi = await this.checkForFtdiChip();
+            debug(hasFtdi);
+            if (!data.hardwareRevision && hasFtdi) {
                 data.hardwareRevision = 9;
                 debug(`EEPROM is not flashed, assuming hw revision 09 based on the presence of the FTDI chip FT2232C (present only on hw rev 09)`)
-            } 
-            if (!data.hardwareRevision && !this.checkForFtdiChip()) {
+            }
+            if (!data.hardwareRevision && !hasFtdi) {
                 data.hardwareRevision = 11;
                 debug(`EEPROM is not flashed, assuming hw revision 11 based on the absence of the FTDI chip FT2232C (present only on hw rev 09)`)
-            } 
+            }
             debug(data);
             return data;
         } catch (error) {
@@ -101,10 +103,10 @@ class Eeprom {
     async checkForFtdiChip() {
         try {
             const { stdout, stderr } = await exec(
-                `lsusb | grep FT2232C`
+                `lsusb`
             );
-            debug(`FTDI chip check  stdout: ${stdout}`);
-            debug(`FTDI chip check  stderr: ${stderr}`);
+            debug(`FTDI chip check stdout: ${stdout}`);
+            debug(`FTDI chip check stderr: ${stderr}`);
             return await stdout.includes('FT2232C');
         } catch (error) {
             throw error;

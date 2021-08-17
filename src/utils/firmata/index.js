@@ -12,11 +12,16 @@ String.prototype.splice = function (idx, rem, str) {
 class FirmataModule {
 
   async init() {
-    const eepromData = await eeprom.info();
-    this.hardwareRevision = eepromData.hardwareRevision;
-    this.SERIAL_PORT = this.hardwareRevision === 9 ? "/dev/ttyUSB0" : "/dev/ttyS0";
-    debug(`hardware revision is ${this.hardwareRevision} - connecting firmata over ${this.SERIAL_PORT}`);
-    this.board = new Firmata(this.SERIAL_PORT, { skipCapabilities: true });
+    try {
+      const eepromData = await eeprom.info();
+      this.hardwareRevision = eepromData.hardwareRevision;
+      this.SERIAL_PORT = this.hardwareRevision === 9 ? "/dev/ttyUSB0" : "/dev/ttyS0";
+      debug(`hardware revision is ${this.hardwareRevision} - connecting firmata over ${this.SERIAL_PORT}`);
+      this.board = new Firmata(this.SERIAL_PORT, { skipCapabilities: true });
+    }
+    catch (error) {
+      throw (error);
+    }
   }
 
   async getVersion() {

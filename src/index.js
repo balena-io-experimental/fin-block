@@ -153,7 +153,7 @@ app.get('/pin', async (req, res) => {
 
 cloud.tag('balenafin-status', 'awake');
 cloud.tag('balenafin-wake-eta', 'N/A');
-firmata.init(constants.DEFAULT_PIN_MAP).then(() => {
+firmata.init(constants.DEFAULT_PIN_MAP_FILE).then(() => {
   if (constants.AUTOFLASH) {
     debug(`autoflash is set to ${constants.AUTOFLASH}`);
     flashFirmwareIfNeeded().then((flashResult) => {

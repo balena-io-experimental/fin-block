@@ -1,7 +1,5 @@
 #!/bin/env node
 
-const jsonfile = require('jsonfile');
-
 module.exports = class Constants {
     constructor() {
         this.DEVICE_NAME = process.env.BALENA_DEVICE_NAME_AT_INIT;
@@ -14,7 +12,6 @@ module.exports = class Constants {
         this.FIRMWARE_URL = process.env.FIRMWARE_URL || `https://github.com/balena-io-hardware/balena-fin-coprocessor-firmata/releases/download/`;
         this.FIRMWARE_FOLDER = process.env.FIRMWARE_FOLDER || `/data/firmware/`;
         this.DEFAULT_PIN_MAP_FILE = process.env.DEFAULT_PIN_MAP_FILE || `/usr/src/app/utils/pinmap.json`;
-        this.DEFAULT_PIN_MAP = jsonfile.readFile(this.DEFAULT_PIN_MAP_FILE);
         this.mfgKeyHash = '$2b$10$dSmJ2k9Uuyu4AglhbRnu0uUnKAmeruexzUielBsr0fMwP./ax.OQy';
     }
 };

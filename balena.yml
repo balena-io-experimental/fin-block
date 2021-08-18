@@ -1,7 +1,8 @@
 name: fin
 description: >-
-  The `fin block` is a balenaBlock that provides flashing utilities, status tagging, sleep control and firmata control functionality of the balenaFin.
-version: 2.0.1
+  The `fin block` is a balenaBlock that provides flashing utilities, status
+  tagging, sleep control and firmata control functionality of the balenaFin.
+version: 2.1.0
 type: sw.application
 assets:
   repository:

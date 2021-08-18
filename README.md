@@ -1,88 +1,70 @@
-# finabler
+![logo](https://raw.githubusercontent.com/balenablocks/fin/master/images/logo.png)
 
-Provides a simple interface for controlling the balenaFin's coprocessor running the firmata protocol.
-The `finabler` block is a docker image that provides flashing utilities, status tagging, sleep control and firmata control functionality.
+**The fin block is a balenaBlock that provides flashing utilities, status tagging, sleep control and firmata control functionality of the [balenaFin](https://www.balena.io/fin/).**
 
-## Features
+## Highlights
 
-- Control the power mode of the balenaFin
-- Control the coprocessor GPIO
-- Retrieve firmata implementation version
-- Automatically flash latest firmata firmware to the coprocessor
-- Ability to set `DEV_MODE` for on device firmware development
-- Pin the firmata release version with `FIRMATA_VERSION`
-- Automatically applies device tree overlays required for the coprocessor
+- **Control the balenaFin's hardware**: Including the balenaFin's power modes and firmata on the coprocessor
+- **Flash the balenaFin's coprocessor**: Either with our provided firmata firmware or with custom firmware
+- **Retrieve manufacturing info about the balenaFin**: Access the serial ID, manufacturing date and more
 
-## Use
+## Setup and configuration
 
-Add the following to your `docker-compose`:
+Use this as standalone with the button below:
+
+[![fin block deploy with balena](https://balena.io/deploy.svg)](https://dashboard.balena-cloud.com/deploy?repoUrl=https://github.com/balenablocks/fin)
+
+Or add the following service to your `docker-compose.yml`:
 
 ```yaml
-version: '2.1'
+version: "2.1"
 volumes:
-    fin:
+  fin:
 services:
-  finabler:
+  fin:
     restart: always
-    image: balenablocks/finabler:latest
+    image: balenablocks/fin:latest
     network_mode: host
     privileged: true
     volumes:
-      - 'fin:/data/firmware'
+      - "fin:/data/firmware"
     labels:
-      io.balena.features.supervisor-api: '1'
-      io.balena.features.balena-api: '1'
+      io.balena.features.supervisor-api: "1"
+      io.balena.features.balena-api: "1"
+    environment:
+      - "DEBUG=firmata,flasher,downloader,supervisor,eeprom,main"
+      - "AUTOFLASH=1"
+      - "AUTOCONFIG=1"
     expose:
       - "1337"
 ```
 
-## API
+> :wrench: Please be aware that this block only supports the balenaFin (v1.+)
 
-The firmata block is partly controlled with a REST interface and partly with device variables.
+## Documentation
 
-### REST Interface
+Head over to our docs for detailed installation and usage instructions, customization options and more!
 
-This is a web API hosted at port `1337` on the local device.
-For example, sending the balenaFin to sleep for 1 minute with a 10 second delay, using `curl`:
+## Motivation
 
-```bash
-curl -X POST localhost:1337/sleep/10/60
-```
-#### [GET] `/ping`
+![fin](https://raw.githubusercontent.com/balenablocks/fin/master/images/fin.png)
 
-Used to know the block is ready to recieve instructions.
+The [balenaFin](https://www.balena.io/fin/) is a Raspberry Pi Compute Module carrier board that can run all the software that the Raspberry Pi can run, but hardened for deployment in the field. 
+Even better, it’s offered at an accessible price point relative to other professional boards.
+This block allows you to easily utilise some of the more advanced features the balenaFin has to offer.
 
-*note: this will be expanded to return HTTP unavailable when the device is flashing or about to reboot*
+## Contributing
 
-#### [GET] `/firmware`
+Do you want to help make balenaSense better? Take a look at our Contributing Guide. Hope to see you around!
 
-Retrieves the firmata implementation version.
+## Getting Help
 
-#### [POST] `/sleep/${int:delay}/${int:timeout}`
+If you're having any problem, please [raise an issue](https://github.com/balenablocks/fin/issues/new) on GitHub and we will be happy to help. 
 
-triggers the balenaFin power saving mode.
-- `delay` (integer): length of time (seconds) the coprocessor will wait before forcefully shutting down the compute module
-- `timeout` (integer): length of time (seconds) the coprocessor will keep the compute module shut down before powering it back on. 
-There is a limit of 97 years (3,058,992,000 seconds) as the max value the coprocessor can handle.
-- You can override update checks that would otherwise prevent the sleep from being triggered passing `force` in the body of the request: `{"force":1}`
+## License
 
-#### [POST] `/set/${int:pin}/${int:state}`
+fin-block is free software, and may be redistributed under the terms specified in the [license](https://github.com/balenablocks/fin/blob/master/LICENSE).
 
-set digital pin state on the coprocessor header.
-- `pin` (integer): `Expansion Header` pin numbering as referred to [here](https://github.com/balena-io/balena-fin-coprocessor-firmata#firmata-pin-map).
-- `state` (integer): is either 1 (on) or 0 (off)
+## Become a balena poweruser
 
-### Device Variables
-
-These should be set from the balenaCloud dashboard and can either be for a specific device or multiple devices in a fleet.
-
-#### `FIRMATA_VERSION`
-
-Setting `FIRMATA_VERSION` will pin a specific firmata release firmware to the device.
-Specific releases can be found from the [firmata release](https://github.com/balena-io/balena-fin-coprocessor-firmata/releases) page or pass `latest` will fetch and install the most recent release firmware.
-
-#### `DEV_MODE`
-
-Setting `DEV_MODE` in the device variables will stop the firmata block from automatically flashing the latest firmata release.
-Instead it will watch a shared volume `/data/firmware` for any `.hex` file changes.
-This can be used as a tight feedback loop for development as another container could compile new `.hex` binaries for compiling and the firmata block will automatically flash them.
+Want to learn more about what makes balena work? Try one of our [masterclasses](https://www.balena.io/docs/learn/more/masterclasses/overview/). Each lesson is a self-contained, deeply detailed walkthrough on core skills you need to be successful with your next edge project.

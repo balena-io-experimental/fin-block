@@ -1,82 +1,82 @@
 [
     {
        "number":0,
-       "direction": "input",
+       "mode": "input",
        "state":0
     },
     {
         "number":1,
-        "direction": "input",
+        "mode": "input",
         "state":0
      },
      {
         "number":2,
-        "direction": "input",
+        "mode": "input",
         "state":0
      },
      {
         "number":3,
-        "direction": "input",
+        "mode": "input",
         "state":0
      },
      {
         "number":4,
-        "direction": "input",
+        "mode": "input",
         "state":0
      },
      {
         "number":5,
-        "direction": "input",
+        "mode": "input",
         "state":0
      },
      {
         "number":6,
-        "direction": "input",
+        "mode": "input",
         "state":0
      },
      {
         "number":7,
-        "direction": "input",
+        "mode": "input",
         "state":0
      },
      {
         "number":8,
-        "direction": "input",
+        "mode": "input",
         "state":0
      },
      {
         "number":9,
-        "direction": "input",
+        "mode": "input",
         "state":0
      },
      {
         "number":10,
-        "direction": "input",
+        "mode": "input",
         "state":0
      },
      {
         "number":11,
-        "direction": "input",
+        "mode": "input",
         "state":0
      },
      {
         "number":12,
-        "direction": "input",
+        "mode": "input",
         "state":0
      },
      {
         "number":13,
-        "direction": "input",
+        "mode": "input",
         "state":0
      },
      {
         "number":14,
-        "direction": "input",
+        "mode": "input",
         "state":0
      },
      {
         "number":15,
-        "direction": "input",
+        "mode": "input",
         "state":0
      }
  ]

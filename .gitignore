@@ -3,3 +3,8 @@ app/node_modules
 dist
 *.hex
 node_modules
+.DS_Store
+meta.json
+landr-dist
+node_modules
+build

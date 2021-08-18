@@ -49,10 +49,11 @@
     "download": "^8.0.0",
     "express": "^4.17.1",
     "firmata": "^2.2.0",
+    "jsonfile": "^6.1.0",
     "lockfile": "^1.0.4",
     "onoff": "^6.0.0",
-    "request": "^2.88.2",
     "promise-request-retry": "^1.0.1",
+    "request": "^2.88.2",
     "serialport": "^9.0.0",
     "sleep-promise": "^8.0.1"
   }

@@ -11,13 +11,14 @@ String.prototype.splice = function (idx, rem, str) {
 
 class FirmataModule {
 
-  async init() {
+  async init(pinMap) {
     try {
       const eepromData = await eeprom.info();
       this.hardwareRevision = eepromData.hardwareRevision;
       this.SERIAL_PORT = this.hardwareRevision === 9 ? "/dev/ttyUSB0" : "/dev/ttyS0";
       debug(`hardware revision is ${this.hardwareRevision} - connecting firmata over ${this.SERIAL_PORT}`);
       this.board = new Firmata(this.SERIAL_PORT, { skipCapabilities: true });
+      await this.setPinMap(pinMap);
     }
     catch (error) {
       throw (error);
@@ -82,7 +83,24 @@ class FirmataModule {
 
   async getPin(pin) {
     try {
-      return await this.board.digitalRead(pin);
+      return await this.board.pins[pin].value
+    } catch (error) {
+      throw (error);
+    }
+  };
+
+  async setPinMap(pinMap) {
+    if (pinMap.length != 16) {
+      throw new Error(`invalid pin map array`);
+    }
+    try {
+      pinMap.forEach((pin) => {
+        debug(`setting pin number ${pin.number} as ${pin.mode} with state ${pin.state}`);
+        this.board.pinMode(pin.number, this.board.MODES[pin.mode]);
+        if (pin.mode === "OUTPUT") {
+          this.board.digitalWrite(pin.number,pin.state);
+        }
+      });
     } catch (error) {
       throw (error);
     }

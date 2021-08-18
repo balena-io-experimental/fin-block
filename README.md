@@ -1,6 +1,6 @@
 # fin block
 
-The `fin block` is a docker image that provides flashing utilities, status tagging, sleep control and firmata control functionality of the [balenaFin](https://www.balena.io/fin/).
+The `fin block` is a balenaBlock that provides flashing utilities, status tagging, sleep control and firmata control functionality of the [balenaFin](https://www.balena.io/fin/).
 
 ## Features
 

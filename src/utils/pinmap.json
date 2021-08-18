@@ -1,82 +1,82 @@
 [
     {
        "number":0,
-       "mode": "input",
+       "mode": "INPUT",
        "state":0
     },
     {
         "number":1,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      },
      {
         "number":2,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      },
      {
         "number":3,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      },
      {
         "number":4,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      },
      {
         "number":5,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      },
      {
         "number":6,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      },
      {
         "number":7,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      },
      {
         "number":8,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      },
      {
         "number":9,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      },
      {
         "number":10,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      },
      {
         "number":11,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      },
      {
         "number":12,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      },
      {
         "number":13,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      },
      {
         "number":14,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      },
      {
         "number":15,
-        "mode": "input",
+        "mode": "INPUT",
         "state":0
      }
  ]

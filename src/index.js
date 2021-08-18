@@ -123,7 +123,7 @@ app.post('/pin', async (req, res) => {
   }
   try {
     debug(`setPin request received for pin ${req.body.pin} and state ${parseInt(req.body.state)}`);
-    await firmata.setPin(req.body.pin);
+    await firmata.setPin(req.body.pin,req.body.state);
     return res.status(200).send("OK");
   } catch (error) {
     debug(error);

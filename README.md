@@ -1,88 +1,246 @@
-# finabler
+# fin block
 
-Provides a simple interface for controlling the balenaFin's coprocessor running the firmata protocol.
-The `finabler` block is a docker image that provides flashing utilities, status tagging, sleep control and firmata control functionality.
+The `fin block` is a docker image that provides flashing utilities, status tagging, sleep control and firmata control functionality of the [balenaFin](https://www.balena.io/fin/).
 
 ## Features
 
-- Control the power mode of the balenaFin
+- Control the power modes of the balenaFin
 - Control the coprocessor GPIO
-- Retrieve firmata implementation version
-- Automatically flash latest firmata firmware to the coprocessor
-- Ability to set `DEV_MODE` for on device firmware development
-- Pin the firmata release version with `FIRMATA_VERSION`
-- Automatically applies device tree overlays required for the coprocessor
+- Flash firmware and bootloader to the coprocessor
+- Retrieve manufacturing information about the balenaFin
+- Automatically applies device tree overlays required for the coprocessor communication
+- Download and flash the latest firmata firmware
 
-## Use
+## Usage
 
-Add the following to your `docker-compose`:
+Add the following service to your `docker-compose`:
 
 ```yaml
-version: '2.1'
+version: "2.1"
 volumes:
-    fin:
+  fin:
 services:
-  finabler:
+  fin:
     restart: always
-    image: balenablocks/finabler:latest
+    image: balenablocks/fin:latest
     network_mode: host
     privileged: true
     volumes:
-      - 'fin:/data/firmware'
+      - "fin:/data/firmware"
     labels:
-      io.balena.features.supervisor-api: '1'
-      io.balena.features.balena-api: '1'
+      io.balena.features.supervisor-api: "1"
+      io.balena.features.balena-api: "1"
+    environment:
+      - "DEBUG=firmata,flasher,downloader,supervisor,eeprom,main"
+      - "AUTOFLASH=1"
+      - "AUTOCONFIG=1"
     expose:
       - "1337"
 ```
 
+## Config
+
+Various functionality can be enabled/disabled by setting certain device variables.
+This includes debug logging, the ability to automatically flash the coprocessor of the balenaFin on startup and automatically configuring device overlays for communication with the balenaFin's coprocessor.
+
+These can either be set in the dockerfile or within the balenaCloud device settings.
+
+#### `DEBUG`
+
+Enables logging for various internal methods including: `firmata`, `flasher`, `downloader`, `supervisor`, `eeprom` and `main`.
+This defaults to `DEBUG=firmata,flasher,downloader,supervisor,eeprom,main`.
+
+```yaml
+  environment:
+    - "DEBUG=firmata,flasher,downloader,supervisor,eeprom,main"
+```
+
+#### `AUTOFLASH`
+
+Enables automatic flashing of the coprocessor upon block startup.
+This should be disabled if using custom firmware as it will currently attempt to flash the latest version of the firmata firmware to the coprocessor.
+It will fetch and download the latest version of the balenaFin coprocessor firmata firmware.
+This defaults to `AUTOFLASH=1`.
+
+```yaml
+  environment:
+    - "AUTOFLASH=1"
+```
+
+#### `AUTOCONFIG`
+
+Enables automatic application of device tree overlays upon block startup.
+This will prompt the device to reboot if the specified balenaFin overlays are missing and need to be applied.
+This defaults to `AUTOCONFIG=1`.
+
+```yaml
+  environment:
+    - "AUTOCONFIG=1"
+```
+
+The `BALENA_HOST_CONFIG_dtoverlay` (DT overlays) that will be applied are:
+```
+"balena-fin"
+"uart1,txd1_pin=32,rxd1_pin=33"
+```
+
+Where the UART configuration is specific to balenaFin v1.1.x devices.
+Additionally, the `BALENA_HOST_CONFIG_core_freq` will be set to 250 for the UART to correctly function.
+
 ## API
 
-The firmata block is partly controlled with a REST interface and partly with device variables.
-
-### REST Interface
-
+The fin block is partly controlled with a REST interface and partly with device variables.
 This is a web API hosted at port `1337` on the local device.
 For example, sending the balenaFin to sleep for 1 minute with a 10 second delay, using `curl`:
 
 ```bash
-curl -X POST localhost:1337/sleep/10/60
+curl -X POST localhost:1337/sleep
 ```
-#### [GET] `/ping`
 
-Used to know the block is ready to recieve instructions.
+with the following payload:
 
-*note: this will be expanded to return HTTP unavailable when the device is flashing or about to reboot*
+```json
+{
+  "sleepTime" : 60,
+  "sleepDelay" : 1
+}
+```
 
-#### [GET] `/firmware`
+#### `firmware`
 
-Retrieves the firmata implementation version.
+This endpoint is used to control the flashing of firmware onto the balenaFin coprocessor.
+If the block is configured for `AUTOFLASH`, firmata firmware will already be flashed to the coprocessor  at startup.
 
-#### [POST] `/sleep/${int:delay}/${int:timeout}`
+##### `GET`
 
-triggers the balenaFin power saving mode.
-- `delay` (integer): length of time (seconds) the coprocessor will wait before forcefully shutting down the compute module
-- `timeout` (integer): length of time (seconds) the coprocessor will keep the compute module shut down before powering it back on. 
-There is a limit of 97 years (3,058,992,000 seconds) as the max value the coprocessor can handle.
-- You can override update checks that would otherwise prevent the sleep from being triggered passing `force` in the body of the request: `{"force":1}`
+```bash
+curl -X GET localhost:1337/firmware
+```
 
-#### [POST] `/set/${int:pin}/${int:state}`
+```json
+{
+  "firmataName":"StandardFirmata",
+  "firmataVersion":"2.5",
+  "implementationVersion":"v2.0.1"
+}
+```
+##### `POST`
 
-set digital pin state on the coprocessor header.
-- `pin` (integer): `Expansion Header` pin numbering as referred to [here](https://github.com/balena-io/balena-fin-coprocessor-firmata#firmata-pin-map).
-- `state` (integer): is either 1 (on) or 0 (off)
+```bash
+curl -X POST localhost:1337/firmware
+```
 
-### Device Variables
+with the following payload:
 
-These should be set from the balenaCloud dashboard and can either be for a specific device or multiple devices in a fleet.
+```json
+{
+  "bootloaderFile" : "/path/to/the/bootloader",
+  "firmwareFile" : "/path/to/the/firmware"
+}
+```
 
-#### `FIRMATA_VERSION`
+#### `eeprom`
 
-Setting `FIRMATA_VERSION` will pin a specific firmata release firmware to the device.
-Specific releases can be found from the [firmata release](https://github.com/balena-io/balena-fin-coprocessor-firmata/releases) page or pass `latest` will fetch and install the most recent release firmware.
+The `eeprom` endpoint is used to read the eeprom on the USB/ethernet hub.
+This contains manufacturing information concerning the balenaFin's serial number, 
 
-#### `DEV_MODE`
+##### `GET`
 
-Setting `DEV_MODE` in the device variables will stop the firmata block from automatically flashing the latest firmata release.
-Instead it will watch a shared volume `/data/firmware` for any `.hex` file changes.
-This can be used as a tight feedback loop for development as another container could compile new `.hex` binaries for compiling and the firmata block will automatically flash them.
+```bash
+curl -X GET localhost:1337/eeprom
+```
+
+This will return the manufacturing information about the target balenaFin.
+For example:
+
+```json
+{
+  "schema":1,
+  "hardwareRevision":10,
+  "batchSerial":123,
+  "week":12,
+  "year":2021,
+  "pcbaLot":"1234-1234",
+  "RAW":"123456789101112-1234"
+}
+```
+
+##### `POST` [for internal/manufacturing use only]
+
+```bash
+curl -X POST localhost:1337/eeprom -H "Content-Type: application/json"
+```
+
+This endpoint is protected by a manufacturing key and should not be used outside of manufacturing as the serial ID is used by the balena support agents for device identification.
+The `serial` parameter should be formatted and validated correctly for the device, which is performed at manufacturing.
+The same serial information is encoded on the QR code sticker on the top of the balenaFin.
+Balena support agents can access this key internally.
+
+```json
+--data 
+'{
+  "serial":"123456789101112-1234", 
+  "mfgKey":"xxxxxxxxx"
+}'
+```
+
+> :warning: If the user modifies or tampers with the serial ID stored at this endpoint, we may be unable to provide device support. Proceed with caution!
+
+#### `sleep`
+
+The `sleep` endpoint is used to send the balenaFin into a low power sleep state.
+The delay to trigger sleep and the period in which the device sleeps can be controlled.
+
+##### `POST`
+
+```bash
+curl -X POST localhost:1337/sleep
+```
+
+The endpoint expects both arguments to be passed upon request, `sleepTime` for the period of sleeping and `sleepDelay` for the time after receiving the command to trigger sleeping (both in seconds).
+`sleepDelay` is useful for safely shutting down the OS before cutting power to it.
+
+with the following payload (60 seconds of sleeping and a 5 second starting delay):
+
+```json
+{
+  "sleepTime" : 60,
+  "sleepDelay" : 5
+}
+```
+
+#### `pin`
+
+This is used to control the GPIO available on the balenaFin coprocessor.
+
+##### `GET`
+
+```bash
+curl -X GET localhost:1337/pin -H "Content-Type: application/json" --data
+```
+
+Retrieves the digital state of a GPIO on the balenaFin's coprocessor.
+`pin` selects the GPIO pin.
+The response will include a 1 or 0 for the `state` of that `pin`.
+
+```json
+{
+  "pin" : 2
+}
+```
+
+##### `POST`
+
+```bash
+curl -X POST localhost:1337/pin
+```
+
+Sets the digital state of a GPIO on the balenaFin's coprocessor.
+`pin` selects the GPIO pin and `state` may be set to 1 or 0.
+
+```json
+{
+  "pin" : 2,
+  "state": true
+}
+```

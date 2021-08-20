@@ -4,7 +4,7 @@ volumes:
 services:
   finblock:
     restart: always
-    image: balenablocks/finabler:latest
+    build: .
     privileged: true
     network_mode: "host"
     volumes:

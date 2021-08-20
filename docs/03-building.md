@@ -1,6 +1,6 @@
-# Building for local development & remote releasing
+# Building
 
-## Local building & testing
+## Local Registry
 
 In order to emulate the pushing images to the balenaBlocks dockerhub org, you can set up a locally hosted docker registry for testing.
 To do this you need to first host a registry server:
@@ -19,7 +19,7 @@ services:
     image: localhost:5000/fin:latest
 ```
 
-## Building with npm scripts
+## npm scripts
 
 We provide `npm` scripts to automate the image building process for development as well as releasing.
 

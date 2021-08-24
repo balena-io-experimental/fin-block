@@ -11,7 +11,7 @@ class Eeprom {
             const serial = await this.readSerial();
             const data = await this.parseSerial(serial);
             const hasFtdi = await this.checkForFtdiChip();
-            debug(hasFtdi);
+            debug(`hasFtdi: ${hasFtdi}`);
             if (!data.hardwareRevision && hasFtdi) {
                 data.hardwareRevision = 9;
                 debug(`EEPROM is not flashed, assuming hw revision 09 based on the presence of the FTDI chip FT2232C (present only on hw rev 09)`)

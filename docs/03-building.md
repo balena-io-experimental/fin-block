@@ -1,8 +1,10 @@
 # Building
 
+This balenaBlock can be pre-built for testing or release.
+In order to emulate the pushing images to the balenaBlocks dockerhub org, such as with releasing the block, you can set up a locally hosted docker registry for testing.
+
 ## Local Registry
 
-In order to emulate the pushing images to the balenaBlocks dockerhub org, you can set up a locally hosted docker registry for testing.
 To do this you need to first host a registry server:
 
 ```bash

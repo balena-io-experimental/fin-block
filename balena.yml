@@ -13,7 +13,7 @@ assets:
   logo:
     type: blob.asset
     data:
-      url: 'https://raw.githubusercontent.com/balenablocks/fin/main/logo.png'
+      url: 'https://github.com/balenablocks/fin/blob/master/images/icon.png'
 data:
   defaultDeviceType: fincm3
   supportedDeviceTypes:

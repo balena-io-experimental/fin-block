@@ -1,11 +1,11 @@
 # Getting started
 
-The fin block is a docker image that provides a simple interface to advanced features of the balenaFin.
-This block can be used in conjunction with other docker services to build complex applications to power your fleets.
+The fin block is a docker image that provides a simple interface to advanced features of the [balenaFin](https://balena.io/fin).
+This block can be used with other docker services to build complex applications to power your fleets.
 
-## Hardware required
+## Hardware
 
-Any balenaFin version v1.x+ will work using this block.
+Any [balenaFin](https://balena.io/fin) version v1.x+ will work using this block.
 Currently this includes:
 
 - v1.0.0
@@ -14,9 +14,9 @@ Currently this includes:
 
 The block will identify hardware version of the device and configure itself accordingly.
 
-## Software required
+## Software
 
-The easiest way to get started controlling the balenaFin is to deploy this block to your fleet using the button below.
+The easiest way to get started controlling the [balenaFin](https://balena.io/fin) is to deploy this block to your fleet using the button below.
 
 [![fin block deploy with balena](https://balena.io/deploy.svg)](https://dashboard.balena-cloud.com/deploy?repoUrl=https://github.com/balenablocks/fin)
 
@@ -48,4 +48,4 @@ services:
 
 ## Support
 
-If you are having issues identifying the version of your balenaFin or are missing the manufacturing information, please create a thread on our forums to get support from one of our agents.
+If you are having issues identifying the version of your [balenaFin](https://balena.io/fin) or are missing the manufacturing information, please create a thread on our [forums](https://forums.balena.io/c/balena-fin/) to get assistance from one of our support agents.

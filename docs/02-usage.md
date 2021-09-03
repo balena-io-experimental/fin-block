@@ -1,6 +1,8 @@
 # Usage
 
-Add the following service to your `docker-compose`:
+In order to use the fin block alongside your application, you can add the service to your `docker-compose` file.
+
+For example:
 
 ```yaml
 version: "2.1"
@@ -25,14 +27,14 @@ services:
       - "1337"
 ```
 
-## Config
+## Config Variables
 
 Various functionality can be enabled/disabled by setting certain device variables.
 This includes debug logging, the ability to automatically flash the coprocessor of the balenaFin on startup and automatically configuring device overlays for communication with the balenaFin's coprocessor.
 
 These can either be set in the dockerfile or within the balenaCloud device settings.
 
-### `DEBUG`
+### DEBUG
 
 Enables logging for various internal methods including: `firmata`, `flasher`, `downloader`, `supervisor`, `eeprom` and `main`.
 This defaults to `DEBUG=firmata,flasher,downloader,supervisor,eeprom,main`.
@@ -42,7 +44,7 @@ This defaults to `DEBUG=firmata,flasher,downloader,supervisor,eeprom,main`.
     - "DEBUG=firmata,flasher,downloader,supervisor,eeprom,main"
 ```
 
-### `AUTOFLASH`
+### AUTOFLASH
 
 Enables automatic flashing of the coprocessor upon block startup.
 This should be disabled if using custom firmware as it will currently attempt to flash the latest version of the firmata firmware to the coprocessor.
@@ -54,7 +56,7 @@ This defaults to `AUTOFLASH=1`.
     - "AUTOFLASH=1"
 ```
 
-### `AUTOCONFIG`
+### AUTOCONFIG
 
 Enables automatic application of device tree overlays upon block startup.
 This will prompt the device to reboot if the specified balenaFin overlays are missing and need to be applied.
@@ -74,7 +76,7 @@ The `BALENA_HOST_CONFIG_dtoverlay` (DT overlays) that will be applied are:
 Where the UART configuration is specific to balenaFin v1.1.x devices.
 Additionally, the `BALENA_HOST_CONFIG_core_freq` will be set to 250 for the UART to correctly function.
 
-## API
+## REST API
 
 The fin block is partly controlled with a REST interface and partly with device variables.
 This is a web API hosted at port `1337` on the local device.
@@ -93,12 +95,12 @@ with the following payload:
 }
 ```
 
-### `firmware`
+### firmware
 
 This endpoint is used to control the flashing of firmware onto the balenaFin coprocessor.
 If the block is configured for `AUTOFLASH`, firmata firmware will already be flashed to the coprocessor  at startup.
 
-#### `GET`
+#### GET
 
 ```bash
 curl -X GET localhost:1337/firmware
@@ -111,7 +113,8 @@ curl -X GET localhost:1337/firmware
   "implementationVersion":"v2.0.1"
 }
 ```
-#### `POST`
+
+#### POST
 
 ```bash
 curl -X POST localhost:1337/firmware
@@ -126,12 +129,12 @@ with the following payload:
 }
 ```
 
-### `eeprom`
+### eeprom
 
 The `eeprom` endpoint is used to read the eeprom on the USB/ethernet hub.
-This contains manufacturing information concerning the balenaFin's serial number, 
+This contains manufacturing information concerning the balenaFin's serial number.
 
-#### `GET`
+#### GET
 
 ```bash
 curl -X GET localhost:1337/eeprom
@@ -152,7 +155,7 @@ For example:
 }
 ```
 
-#### `POST` [for internal/manufacturing use only]
+#### POST [for internal/manufacturing use only]
 
 ```bash
 curl -X POST localhost:1337/eeprom -H "Content-Type: application/json"
@@ -173,12 +176,12 @@ Balena support agents can access this key internally.
 
 > :warning: If the user modifies or tampers with the serial ID stored at this endpoint, we may be unable to provide device support. Proceed with caution!
 
-### `sleep`
+### sleep
 
 The `sleep` endpoint is used to send the balenaFin into a low power sleep state.
 The delay to trigger sleep and the period in which the device sleeps can be controlled.
 
-#### `POST`
+#### POST
 
 ```bash
 curl -X POST localhost:1337/sleep
@@ -196,11 +199,11 @@ with the following payload (60 seconds of sleeping and a 5 second starting delay
 }
 ```
 
-### `pin`
+### pin
 
 This is used to control the GPIO available on the balenaFin coprocessor.
 
-#### `GET`
+#### GET
 
 ```bash
 curl -X GET localhost:1337/pin -H "Content-Type: application/json" --data
@@ -216,7 +219,7 @@ The response will include a 1 or 0 for the `state` of that `pin`.
 }
 ```
 
-#### `POST`
+#### POST
 
 ```bash
 curl -X POST localhost:1337/pin

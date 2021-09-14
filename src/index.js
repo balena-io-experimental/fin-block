@@ -117,10 +117,7 @@ app.post('/sleep', async (req, res) => {
   }
 });
 
-app.post('/pin', async (req, res) => {
-  if (!req.body.pin) {
-    return res.status(400).send("request is missing pin and/or state parameter");
-  }
+app.put('/pin', async (req, res) => {
   try {
     debug(`setPin request received for pin ${req.body.pin} and state ${parseInt(req.body.state)}`);
     await firmata.setPin(req.body.pin,req.body.state);
@@ -131,10 +128,18 @@ app.post('/pin', async (req, res) => {
   }
 });
 
-app.get('/pin', async (req, res) => {
-  if (!req.body.pin) {
-    return res.status(400).send("request is missing pin parameter");
+app.post('/pin', async (req, res) => {
+  try {
+    debug(`pinMode request received for pin ${req.body.pin} and mode ${req.body.mode}`);
+    await firmata.pinMode(req.body.pin,req.body.mode);
+    return res.status(200).send("OK");
+  } catch (error) {
+    debug(error);
+    return res.status(500).send(error.message);
   }
+});
+
+app.get('/pin', async (req, res) => {
   try {
     debug(`getPin request received for pin ${req.body.pin}`);
     const pinState = await firmata.getPin(req.body.pin);
@@ -144,6 +149,18 @@ app.get('/pin', async (req, res) => {
     }
     debug(`returning pin state for pin ${data.pin} : ${data.state}`)
     return res.status(200).send(data);
+  } catch (error) {
+    debug(error);
+    return res.status(500).send(error.message);
+  }
+});
+
+app.get('/pins', async (req, res) => {
+  try {
+    debug(`getPins request received`);
+    const pins = await firmata.getPins();
+    debug(pins)
+    return res.status(200).send(pins);
   } catch (error) {
     debug(error);
     return res.status(500).send(error.message);

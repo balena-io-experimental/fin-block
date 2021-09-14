@@ -3,7 +3,6 @@
 const debug = require('debug')('firmata');
 const Firmata = require("firmata");
 const eeprom = require('../eeprom/index.js');
-const jsonfile = require('jsonfile');
 const balenaSysex = 0x0B;
 const balenaSysexSubCommandFirmware = 0x00;
 String.prototype.splice = function (idx, rem, str) {
@@ -12,15 +11,13 @@ String.prototype.splice = function (idx, rem, str) {
 
 class FirmataModule {
 
-  async init(pinMapFile) {
+  async init() {
     try {
       const eepromData = await eeprom.info();
       this.hardwareRevision = eepromData.hardwareRevision;
       this.SERIAL_PORT = this.hardwareRevision === 9 ? "/dev/ttyUSB0" : "/dev/ttyS0";
       debug(`hardware revision is ${this.hardwareRevision} - connecting firmata over ${this.SERIAL_PORT}`);
       this.board = new Firmata(this.SERIAL_PORT, { skipCapabilities: true });
-      this.DEFAULT_PIN_MAP = await jsonfile.readFile(pinMapFile);
-      await this.setPinMap(this.DEFAULT_PIN_MAP);
     }
     catch (error) {
       throw (error);
@@ -91,19 +88,18 @@ class FirmataModule {
     }
   };
 
-  async setPinMap(pinMap) {
-    debug(pinMap);
-    if (pinMap.length != 16) {
-      throw new Error(`invalid pin map array. expected length of 16, got ${pinMap.length}`);
-    }
+  async getPins() {
     try {
-      pinMap.forEach((pin) => {
-        debug(`setting pin number ${pin.number} as ${pin.mode} with state ${pin.state}`);
-        this.board.pinMode(pin.number, this.board.MODES[pin.mode]);
-        if (pin.mode === "OUTPUT") {
-          this.board.digitalWrite(pin.number,pin.state === 0 ? this.board.LOW : this.board.HIGH);
-        }
-      });
+      return await this.board.pins
+    } catch (error) {
+      throw (error);
+    }
+  };
+
+  async pinMode(pin,mode) {
+    try {
+        debug(`setting pin number ${pin} as ${mode}`);
+        return await this.board.pinMode(pin, this.board.MODES[mode]);
     } catch (error) {
       throw (error);
     }

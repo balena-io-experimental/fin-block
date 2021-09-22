@@ -49,7 +49,7 @@ Head over to our docs for detailed installation and usage instructions, customiz
 
 ![fin](https://raw.githubusercontent.com/balenablocks/fin/master/images/fin.png)
 
-The [balenaFin](https://www.balena.io/fin/) is a Raspberry Pi Compute Module carrier board that can run all the software that the Raspberry Pi can run, but hardened for deployment in the field. 
+The [balenaFin](https://www.balena.io/fin/) is a Raspberry Pi Compute Module carrier board that can run all the software that the Raspberry Pi can run, but hardened for deployment in the field.
 Even better, it’s offered at an accessible price point relative to other professional boards.
 This block allows you to easily utilise some of the more advanced features the balenaFin has to offer.
 
@@ -59,12 +59,8 @@ Do you want to help make balenaSense better? Take a look at our Contributing Gui
 
 ## Getting Help
 
-If you're having any problem, please [raise an issue](https://github.com/balenablocks/fin/issues/new) on GitHub and we will be happy to help. 
+If you're having any problem, please [raise an issue](https://github.com/balenablocks/fin/issues/new) on GitHub and we will be happy to help.
 
 ## License
 
 fin-block is free software, and may be redistributed under the terms specified in the [license](https://github.com/balenablocks/fin/blob/master/LICENSE).
-
-## Become a balena poweruser
-
-Want to learn more about what makes balena work? Try one of our [masterclasses](https://www.balena.io/docs/learn/more/masterclasses/overview/). Each lesson is a self-contained, deeply detailed walkthrough on core skills you need to be successful with your next edge project.

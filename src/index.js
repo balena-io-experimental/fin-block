@@ -80,7 +80,8 @@ app.post('/eeprom', async (req, res) => {
   }
   try {
     const mfgCheck = await checkMfgKey(req.body.mfgKey);
-    if (mfgCheck) {
+    const serialCheck = await eeprom.parseSerial(req.body.serial);
+    if (mfgCheck && serialCheck) {
       debug(`eeprom flash request received, writing ${req.body.serial}`);
       const data = await eeprom.writeSerial(req.body.serial);
       return res.status(200).send(data);

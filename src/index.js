@@ -10,6 +10,7 @@ const Supervisor = require(__dirname + '/utils/supervisor/index.js');
 const Downloader = require(__dirname + '/utils/downloader/index.js');
 const BalenaCloud = require(__dirname + '/utils/balena-cloud/index.js');
 const eeprom = require(__dirname + '/utils/eeprom/index.js');
+const usb = require(__dirname + '/utils/usb/index.js');
 const flasher = require(__dirname + '/utils/flasher/index.js');
 const supervisor = new Supervisor();
 const downloader = new Downloader();
@@ -62,6 +63,24 @@ app.post('/firmware', async (req, res) => {
     return res.status(500).send(error.message);
   }
 });
+
+app.post('/usb', async (req, res) => {
+  try {
+    let data;
+    debug(`usb control request received, setting port ${req.body.port} to mode ${req.body.mode}`)
+    if (!req.body.mode) {
+      data = await usb.info()
+    }
+    else {
+      data = await usb.set(req.body.mode, req.body.port)
+    }
+    return res.status(200).send(data);
+  } catch (error) {
+    debug(error);
+    return res.status(500).send(error.message);
+  }
+});
+
 
 app.get('/eeprom', async (req, res) => {
   try {

@@ -17,6 +17,7 @@ const downloader = new Downloader();
 const cloud = new BalenaCloud();
 const express = require('express');
 const compression = require('compression');
+const fs = require('fs/promises');
 const bodyParser = require("body-parser");
 
 const app = express();
@@ -216,6 +217,7 @@ async function flashFirmwareIfNeeded() {
       const balenaFinSerial = await eeprom.info();
       debug(`balenaFin HW revision is ${balenaFinSerial.hardwareRevision}`);
       cloud.tag('balenafin-status', 'flashing');
+      await checkBootloaderExists();
       await flash(balenaFinSerial.hardwareRevision, firmwareFile, constants.BOOTLOADER_FILE);
       cloud.tag('balenafin-status', 'awake');
       return {
@@ -235,6 +237,18 @@ async function flash(hwRev, firmwareFile, bootloaderFile) {
     return await supervisor.updateUnlock();
   } catch (error) {
     await supervisor.updateUnlock();
+    throw error;
+  }
+}
+
+async function checkBootloaderExists() {
+  try {
+    const bootloaderFile = new File(constants.BOOTLOADER_FILE);
+    if (!bootloaderFile.exists()) {
+      await fs.copyFile('openocd/bootloader.s37', constants.BOOTLOADER_FILE);
+    }
+    return true;
+  } catch (error) {
     throw error;
   }
 }

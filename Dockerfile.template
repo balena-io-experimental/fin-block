@@ -38,4 +38,4 @@ COPY ./src ./
 COPY ./openocd ./openocd
 
 # Start app
-CMD ["bash", "/usr/src/app/start.sh"]
+CMD ["node", "index.js"]

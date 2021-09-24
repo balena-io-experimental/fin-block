@@ -1,6 +1,6 @@
 name: fin
 description: >-
-  The `fin block` is a balenaBlock that provides flashing utilities, status
+  The fin block is a balenaBlock that provides flashing utilities, status
   tagging, sleep control and firmata control functionality of the balenaFin.
 fleetcta: Control the balenaFin
 version: 3.2.1

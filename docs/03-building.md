@@ -1,4 +1,4 @@
-# Building
+# Building Docker Image
 
 This balenaBlock can be pre-built for testing or release.
 In order to emulate the pushing images to the balenaBlocks dockerhub org, such as with releasing the block, you can set up a locally hosted docker registry for testing.

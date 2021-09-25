@@ -1,4 +1,4 @@
-# Getting started
+# Information
 
 The fin block is a docker image that provides a simple interface to advanced features of the [balenaFin](https://balena.io/fin).
 This block can be used with other docker services to build complex applications to power your fleets.

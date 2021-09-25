@@ -1,5 +1,5 @@
 {
-  "name": "fin",
+  "name": "fin-block",
   "version": "1.1.0",
   "description": "balenaBlock that provides a simple interface for controlling the balenaFin. This includes access to manufacturing information, flashing and controlling the coprocessor and sleeping the balenaFin.",
   "main": "index.js",

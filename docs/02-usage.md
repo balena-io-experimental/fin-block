@@ -1,4 +1,4 @@
-# Docker Compose
+# Usage
 
 In order to use the fin block alongside your application, you can add the service to your `docker-compose` file.
 

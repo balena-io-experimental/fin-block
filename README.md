@@ -1,4 +1,4 @@
-![logo](https://raw.githubusercontent.com/balenablocks/fin/master/docs/images/logo.png)
+![logo](images/logo.png)
 
 **The fin block is a balenaBlock that provides flashing utilities, status tagging, sleep control and firmata control functionality of the [balenaFin](https://www.balena.io/fin/).**
 
@@ -47,7 +47,7 @@ Head over to our docs for detailed installation and usage instructions, customiz
 
 ## Motivation
 
-![fin](https://raw.githubusercontent.com/balenablocks/fin/master/docs/images/fin.png)
+![fin](images/fin.png)
 
 The [balenaFin](https://www.balena.io/fin/) is a Raspberry Pi Compute Module carrier board that can run all the software that the Raspberry Pi can run, but hardened for deployment in the field.
 Even better, it’s offered at an accessible price point relative to other professional boards.

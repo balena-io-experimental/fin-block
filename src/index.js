@@ -20,8 +20,9 @@ const bodyParser = require("body-parser");
 
 const app = express();
 errorHandler = (err, req, res, next) => {
-  res.status(500);
-  res.render('error', {
+  res.status(err.status || 500);
+  res.json({
+    message: err.message,
     error: err
   });
 };

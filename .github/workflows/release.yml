@@ -1,23 +1,24 @@
 name: Push release to a balena fleet
 
 on:
-  push:
-    branches: [master, main]
+  pull_request:
+    types: [opened, synchronize, closed]
+    branches:
+      - master
 
 jobs:
   balena_cloud_build:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Build and push to balena fleet
+      - name: Build and push to balena
         uses: balena-io/balena-ci@master
         id: build
         with:
           balena_token: ${{ secrets.BALENA_TOKEN }}
-          fleet: balenablocks/fin-block
+          fleet: my_org/sample_fleet
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log release ID built

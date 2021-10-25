@@ -5,6 +5,7 @@ on:
     types: [opened, synchronize, closed]
     branches:
       - master
+      - main
 
 jobs:
   balena_cloud_build:
@@ -13,12 +14,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Build and push to balena
+
+      - name: Build and push to balena fleet
         uses: balena-io/balena-ci@master
         id: build
         with:
           balena_token: ${{ secrets.BALENA_TOKEN }}
-          fleet: my_org/sample_fleet
+          fleet: balenablocks/fin-block
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log release ID built

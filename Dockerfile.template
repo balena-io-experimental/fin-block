@@ -10,7 +10,7 @@ RUN JOBS=MAX npm install --unsafe-perm --production && npm cache clean --force
 ## target base image
 FROM balenalib/fincm3-node:${NODEJS_VERSION}-run
 ENV BALENA_OPENOCD_VERSION 0.11.0+dev-g3d9534b-dirty
-ENV BALENA_FIN_SDK_VERSION 0.2.0
+ENV BALENA_UHUBCTL_VERSION 2.4.0
 
 WORKDIR /usr/src/app
 # gather compiled node modules from buildstep
@@ -20,6 +20,8 @@ COPY --from=buildstep /usr/src/app/node_modules node_modules
 RUN install_packages \
     ftdi-eeprom \
     libftdi-dev \
+    libusb-1.0-0-dev \
+    libusb-1.0 \
     telnet \
     ethtool
 
@@ -27,9 +29,13 @@ RUN install_packages \
 RUN mkdir openocd && cd openocd && curl -Ls https://github.com/balena-io/balena-fin-openocd/releases/download/v${BALENA_OPENOCD_VERSION}/openocd.tar.gz | tar -xvz -C . \
     && chmod +x install.sh && ./install.sh && cd /usr/src/app && rm -rf openocd
 
+# install uhubctl
+RUN mkdir uhubctl && cd uhubctl && curl -Ls https://github.com/balena-io-playground/balena-fin-uhubctl/releases/download/v${BALENA_UHUBCTL_VERSION}/uhubctl-v${BALENA_UHUBCTL_VERSION}.tar.gz | tar -xvz -C . \
+    && chmod +x usr/src/app/uhubctl/uhubctl && cp usr/src/app/uhubctl/uhubctl /usr/local/bin/uhubctl && cd /usr/src/app && rm -rf uhubctl
+
 # Move app to filesystem
 COPY ./src ./
 COPY ./openocd ./openocd
 
 # Start app
-CMD ["bash", "/usr/src/app/start.sh"]
+CMD ["node", "index.js"]

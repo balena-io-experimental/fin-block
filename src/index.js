@@ -10,12 +10,14 @@ const Supervisor = require(__dirname + '/utils/supervisor/index.js');
 const Downloader = require(__dirname + '/utils/downloader/index.js');
 const BalenaCloud = require(__dirname + '/utils/balena-cloud/index.js');
 const eeprom = require(__dirname + '/utils/eeprom/index.js');
+const usb = require(__dirname + '/utils/usb/index.js');
 const flasher = require(__dirname + '/utils/flasher/index.js');
 const supervisor = new Supervisor();
 const downloader = new Downloader();
 const cloud = new BalenaCloud();
 const express = require('express');
 const compression = require('compression');
+const fs = require('fs/promises');
 const bodyParser = require("body-parser");
 
 const app = express();
@@ -62,6 +64,24 @@ app.post('/firmware', async (req, res) => {
     return res.status(500).send(error.message);
   }
 });
+
+app.post('/usb', async (req, res) => {
+  try {
+    let data;
+    debug(`usb control request received, setting port ${req.body.port} to mode ${req.body.mode}`)
+    if (!req.body.mode) {
+      data = await usb.info()
+    }
+    else {
+      data = await usb.set(req.body.mode, req.body.port)
+    }
+    return res.status(200).send(data);
+  } catch (error) {
+    debug(error);
+    return res.status(500).send(error.message);
+  }
+});
+
 
 app.get('/eeprom', async (req, res) => {
   try {
@@ -197,6 +217,7 @@ async function flashFirmwareIfNeeded() {
       const balenaFinSerial = await eeprom.info();
       debug(`balenaFin HW revision is ${balenaFinSerial.hardwareRevision}`);
       cloud.tag('balenafin-status', 'flashing');
+      await checkBootloaderExists();
       await flash(balenaFinSerial.hardwareRevision, firmwareFile, constants.BOOTLOADER_FILE);
       cloud.tag('balenafin-status', 'awake');
       return {
@@ -216,6 +237,18 @@ async function flash(hwRev, firmwareFile, bootloaderFile) {
     return await supervisor.updateUnlock();
   } catch (error) {
     await supervisor.updateUnlock();
+    throw error;
+  }
+}
+
+async function checkBootloaderExists() {
+  try {
+    const bootloaderFile = new File(constants.BOOTLOADER_FILE);
+    if (!bootloaderFile.exists()) {
+      await fs.copyFile('openocd/bootloader.s37', constants.BOOTLOADER_FILE);
+    }
+    return true;
+  } catch (error) {
     throw error;
   }
 }

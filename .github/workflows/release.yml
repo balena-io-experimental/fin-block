@@ -1,16 +1,19 @@
 name: Push release to a balena fleet
 
 on:
-  push:
-    branches: [master, main]
+  pull_request:
+    types: [opened, synchronize, closed]
+    branches:
+      - master
+      - main
 
 jobs:
   balena_cloud_build:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
 
       - name: Build and push to balena fleet
         uses: balena-io/balena-ci@master

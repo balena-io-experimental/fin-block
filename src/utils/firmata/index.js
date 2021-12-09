@@ -74,7 +74,7 @@ class FirmataModule {
 
   async setPin(pin, state) {
     try {
-      return await this.board.digitalWrite(pin, state);
+      return await this.board.digitalWrite(pin, state === 0 ? this.board.LOW : this.board.HIGH, false);
     } catch (error) {
       throw (error);
     }
@@ -82,7 +82,24 @@ class FirmataModule {
 
   async getPin(pin) {
     try {
-      return await this.board.digitalRead(pin);
+      return await this.board.pins[pin].value
+    } catch (error) {
+      throw (error);
+    }
+  };
+
+  async getPins() {
+    try {
+      return await this.board.pins
+    } catch (error) {
+      throw (error);
+    }
+  };
+
+  async pinMode(pin,mode) {
+    try {
+        debug(`setting pin number ${pin} as ${mode}`);
+        return await this.board.pinMode(pin, this.board.MODES[mode]);
     } catch (error) {
       throw (error);
     }

@@ -30,6 +30,7 @@ RUN mkdir openocd && cd openocd && curl -Ls https://github.com/balena-io/balena-
 # Move app to filesystem
 COPY ./src ./
 COPY ./openocd ./openocd
+COPY ./VERSION ./VERSION
 
 # Start app
 CMD ["bash", "/usr/src/app/start.sh"]

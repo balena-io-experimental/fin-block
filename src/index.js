@@ -63,6 +63,22 @@ app.post('/firmware', async (req, res) => {
   }
 });
 
+app.get('/version', async (req, res) => {
+  try {
+    const versions = {
+      "fin": (await eeprom.info()).hardwareRevision,
+      "firmata": await firmata.getVersion(),
+      "block": constants.BLOCK_VERSION
+    };
+
+    debug(`balenaFin: ${versions.fin} | firmata: ${versions.firmata} | fin-block: ${versions.block}`);
+    return res.status(200).send(versions);
+  } catch (error) {
+    debug(error);
+    return res.status(500).send(error.message);
+  }
+});
+
 app.get('/eeprom', async (req, res) => {
   try {
     const data = await eeprom.info();
@@ -154,6 +170,7 @@ app.get('/pin', async (req, res) => {
 
 cloud.tag('balenafin-status', 'awake');
 cloud.tag('balenafin-wake-eta', 'N/A');
+debug(`fin-block version: ${constants.BLOCK_VERSION}`);
 firmata.init().then(() => {
   if (constants.AUTOFLASH) {
     debug(`autoflash is set to ${constants.AUTOFLASH}`);

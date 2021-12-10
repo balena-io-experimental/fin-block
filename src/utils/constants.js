@@ -3,6 +3,7 @@
 module.exports = class Constants {
     constructor() {
         this.DEVICE_NAME = process.env.BALENA_DEVICE_NAME_AT_INIT;
+        this.BLOCK_VERSION = process.env.BLOCK_VERSION;
         this.PORT = parseInt(process.env.PORT) || 1337;
         this.AUTOFLASH = parseInt(process.env.AUTOFLASH) || 0;
         this.AUTOCONFIG = parseInt(process.env.AUTOCONFIG) || 0;

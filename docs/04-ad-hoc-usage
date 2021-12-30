@@ -1,0 +1,35 @@
+
+# Ad Hoc Usage
+To make the functionality accessible outside of a balena fleet release the `balenablock/fin` image can be executed as container on a balenaFin This is needed when some functionality of this block is needed ad hoc or sporadically on devices that run an existing release. The `balenablock/fin` image can be executed by calling the balena engine command line tools on a balenaFin running balenaOS.
+
+## Execution on Fin
+From a hostOS terminal execute
+
+```bash
+balena run -d \
+  --network=host \
+  --privileged \
+  -v fin:/data/firmware \
+  -e "DEBUG=firmata,flasher,downloader,supervisor,eeprom,main" \
+  -e "AUTOFLASH=1" \
+  -e "AUTOCONFIG=1" \
+  --name finblock \
+  balenablocks/fin:latest
+```
+This will execute the fin block as container in the background and will provide the API on localhost port 1337.
+
+
+### Requesting API 
+Afterwards the API can be requested for data, for example the eeprom data.
+```bash
+curl -sX GET localhost:1337/eeprom
+```
+
+### Teardown
+The container should be stopped and the image should be deleted:
+
+```bash
+balena stop finblock
+balena container rm finblock
+balena rmi balenablocks/fin:latest --force
+```

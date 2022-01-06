@@ -155,6 +155,21 @@ For example:
 }
 ```
 
+The manufacturing information can be decoded as follows:
+
+```yaml
+schema: schema version of the manufacturing information
+hardwareRevision: 
+  - 9: balenaFin v1.0.0
+  - 10: balenaFin v1.1.0
+  - 11: balenaFin v1.1.1
+batchSerial: position of balenaFin in the manufacturing run
+week: week of manufacturing run
+year: year of manufacturing run
+pcbaLot: pcb manufacturer's batch code for the balenaFin
+RAW: raw manufacturing information string before decoding
+```
+
 #### POST [for internal/manufacturing use only]
 
 ```bash

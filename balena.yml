@@ -3,7 +3,7 @@ description: >-
   The fin block is a balenaBlock that provides flashing utilities, status
   tagging, sleep control and firmata control functionality of the balenaFin.
 fleetcta: Control the balenaFin
-version: 3.6.1
+version: 3.7.0
 type: sw.application
 assets:
   repository:

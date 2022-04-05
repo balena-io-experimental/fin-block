@@ -1,5 +1,7 @@
 ![logo](https://raw.githubusercontent.com/balenablocks/fin/master/images/logo.png)
 
+[![balena](https://github.com/balenablocks/fin-block/actions/workflows/balena.yml/badge.svg)](https://github.com/balenablocks/browser/actions/workflows/balena.yml)
+
 **The fin block is a balenaBlock that provides flashing utilities, status tagging, sleep control and firmata control functionality of the [balenaFin](https://www.balena.io/fin/).**
 
 ## Highlights
@@ -23,7 +25,7 @@ volumes:
 services:
   fin:
     restart: always
-    image: balenablocks/fin:latest
+    image: bh.cr/balenablocks/fin-block 
     network_mode: host
     privileged: true
     volumes:
@@ -52,6 +54,11 @@ Head over to our docs for detailed installation and usage instructions, customiz
 The [balenaFin](https://www.balena.io/fin/) is a Raspberry Pi Compute Module carrier board that can run all the software that the Raspberry Pi can run, but hardened for deployment in the field.
 Even better, it’s offered at an accessible price point relative to other professional boards.
 This block allows you to easily utilise some of the more advanced features the balenaFin has to offer.
+
+## Notes
+
+The fin block is now maintained at balena's registry and the image can be found at `bh.cr/balenablocks/fin-block`.
+The image is still maintained at Docker Hub (`balenablocks/finabler`) but will no longer be updated, so please switch to balena's registry if you wish to use the latest version.
 
 ## Contributing
 

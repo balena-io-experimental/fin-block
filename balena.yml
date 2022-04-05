@@ -4,8 +4,8 @@ description: >-
   tagging, sleep control and firmata control functionality of the balenaFin.
 post-provisioning: >-
   [![balena](https://github.com/balenablocks/fin-block/actions/workflows/balena.yml/badge.svg)](https://github.com/balenablocks/browser/actions/workflows/balena.yml)
-  ## Usage instructions
-  Include this snippet in your docker-compose.yml file under 'services':
+  ## Usage instructions Include this snippet in your docker-compose.yml file
+  under 'services':
     
     ```
     fin:
@@ -32,7 +32,7 @@ post-provisioning: >-
         ...
     ```
 fleetcta: Control the balenaFin
-version: 3.7.0
+version: 3.8.0
 type: sw.application
 assets:
   repository:

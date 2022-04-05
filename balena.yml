@@ -1,4 +1,4 @@
-name: fin
+name: fin-block
 description: >-
   The fin block is a balenaBlock that provides flashing utilities, status
   tagging, sleep control and firmata control functionality of the balenaFin.

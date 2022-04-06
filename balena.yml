@@ -1,11 +1,15 @@
 name: fin
+
 description: >-
   The fin block is a balenaBlock that provides flashing utilities, status
   tagging, sleep control and firmata control functionality of the balenaFin.
+
 post-provisioning: >-
   [![balena](https://github.com/balenablocks/fin-block/actions/workflows/balena.yml/badge.svg)](https://github.com/balenablocks/browser/actions/workflows/balena.yml)
-  ## Usage instructions Include this snippet in your docker-compose.yml file
-  under 'services':
+
+  ## Usage instructions 
+
+  Include this snippet in your docker-compose.yml file under 'services':
     
     ```
     fin:
@@ -25,12 +29,15 @@ post-provisioning: >-
       expose:
         - "1337"
     ```
+
     To pin to a specific [version](CHANGELOG.md) of this block use:
+
     ```
       fin:
         image: bh.cr/balenablocks/fin-block/<version>
         ...
     ```
+
 fleetcta: Control the balenaFin
 version: 3.8.0
 type: sw.application

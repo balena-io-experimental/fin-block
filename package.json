@@ -1,6 +1,6 @@
 {
   "name": "fin",
-  "version": "1.1.0",
+  "version": "3.8.2",
   "description": "balenaBlock that provides a simple interface for controlling the balenaFin. This includes access to manufacturing information, flashing and controlling the coprocessor and sleeping the balenaFin.",
   "main": "index.js",
   "scripts": {
@@ -57,5 +57,8 @@
     "request": "^2.88.2",
     "serialport": "^9.0.0",
     "sleep-promise": "^8.0.1"
+  },
+  "versionist": {
+    "publishedAt": "2022-10-10T18:40:25.652Z"
   }
 }

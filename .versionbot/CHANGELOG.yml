@@ -1,0 +1,955 @@
+- commits:
+    - subject: moving from balenablocks to balena-labs-projects
+      hash: ddc049b07f70ea9c7ee960a71ed522fab2164ca3
+      body: ""
+      footer:
+        Signed-off-by: Flynn Joffray <flynn@balena.io>
+        signed-off-by: Flynn Joffray <flynn@balena.io>
+        Change-type: patch
+        change-type: patch
+      author: Flynn Joffray
+      nested: []
+  version: 3.8.2
+  title: ""
+  date: 2022-11-16T02:29:16.274Z
+- version: 3.8.1
+  date: 2022-04-06T10:53:02Z
+  commits:
+    - hash: 2f02158d16627f0624b6c9fa748653e31032f34d
+      author: Alex
+      footers:
+        change-type: patch
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+      subject: Fixed balena.yml
+      body: null
+- version: 3.8.0
+- date: 2022-04-05T14:26:25Z
+- commits:
+    - hash: 9586bfd6a7cafb70026645ba3fc37a498c6a8c51
+- commits:
+    - author: Alex
+- commits:
+    - footers:
+        change-type: minor
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Updates for balena blocks
+- commits:
+    - body: null
+- version: 3.7.0
+- date: 2022-03-25T15:09:28Z
+- commits:
+    - hash: 0ffd61912d573c26bcd30668a35dce5a916567ba
+- commits:
+    - author: Alex
+- commits:
+    - footers:
+        change-type: minor
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Adds releasing block to bh.cr
+- commits:
+    - body: null
+- version: 3.6.1
+- date: 2022-01-06T11:27:11Z
+- commits:
+    - hash: 23cd94fb4598bcb11db526d3c8b1a7034a65a98f
+- commits:
+    - author: Alex
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Explains manufacturing string information
+- commits:
+    - body: null
+- version: 3.6.0
+- date: 2021-12-10T11:52:46Z
+- commits:
+    - hash: dc8fac22b6e76c84797d4488d080f31eac904149
+- commits:
+    - author: Alex
+- commits:
+    - footers:
+        change-type: minor
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Adds repo version into block
+- commits:
+    - body: null
+- version: 3.5.0
+- date: 2021-12-09T23:28:41Z
+- commits:
+    - hash: 5729f7c1f923fa704e96f71ebf2f3fd7832c9161
+- commits:
+    - author: Alex
+- commits:
+    - footers:
+        change-type: minor
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Changed publish image repo to docker hub
+- commits:
+    - body: null
+- version: 3.4.1
+- date: 2021-10-25T14:59:24Z
+- commits:
+    - hash: c8b1644f58d3f948088aa9c10a97735ede62f634
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Removed unnecessary architectures
+- commits:
+    - body: null
+- version: 3.4.0
+- date: 2021-10-25T14:52:03Z
+- commits:
+    - hash: 975efc7db7e52a6964af5eaffdf4822e6ea029c5
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Fixed directory name
+- commits:
+    - body: null
+- commits:
+    - hash: 57488206900585a66f571322d38ebf5f734ebb84
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: minor
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Dockerfile.template -> Dockerfile and adjusted for draft releases
+- commits:
+    - body: null
+- commits:
+    - hash: 4decbe75af4ced07734a8eb83679982e6131031f
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Merge branch 'master' into adapted-dockerfile
+- commits:
+    - body: null
+- version: 3.3.1
+- date: 2021-10-25T14:35:01Z
+- commits:
+    - hash: 81c0049d7812b9a9064f421f32dd6e77ef72a665
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Fixed directory name
+- commits:
+    - body: null
+- version: 3.3.0
+- date: 2021-10-25T14:28:40Z
+- commits:
+    - hash: 2dbd9e8012dd82a10b32e351c80a7620d7667654
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: minor
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Added github actions for pushing to fleet and releasing images
+- commits:
+    - body: null
+- version: 3.2.2
+- date: 2021-09-24T18:48:09Z
+- commits:
+    - hash: b31733860e9b5f7838a771009a63fc0ad5abb20c
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Fixes description
+- commits:
+    - body: null
+- version: 3.2.1
+- date: 2021-09-22T22:08:31Z
+- commits:
+    - hash: 7ac451afca06c52d63b279795d3782e277c4a5f4
+- commits:
+    - author: Alex
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Fixes icon
+- commits:
+    - body: null
+- version: 3.2.0
+- date: 2021-09-22T21:33:55Z
+- commits:
+    - hash: 0737a13020094e43c2616a9e8292e8995fb23a24
+- commits:
+    - author: Alex
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Tidying up landr pages
+- commits:
+    - body: null
+- commits:
+    - hash: 4c6f0d0ae307eaed3e34481408d8e8677111bad9
+- commits:
+    - author: Alex
+- commits:
+    - footers:
+        change-type: minor
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Adds parsing on write to check serial data is valid and tests to
+        validate.
+- commits:
+    - body: null
+- commits:
+    - hash: c0560cb557f31b2f015817d92388538b68164787
+- commits:
+    - author: Balena CI
+- commits:
+    - subject: v3.1.0
+- commits:
+    - body: null
+- version: 3.1.0
+- date: 2021-09-22T21:11:01Z
+- commits:
+    - hash: f96f38e71e5337410404c0fad68649c612e0fe24
+- commits:
+    - author: Alex
+- commits:
+    - footers:
+        change-type: minor
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Adds parsing on write to check serial data is valid and tests to
+        validate.
+- commits:
+    - body: null
+- version: 3.0.1
+- date: 2021-08-20T11:17:12Z
+- commits:
+    - hash: c6b46d8d7afefec640663d04b4f0ca756f9099d0
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Various docs fixes
+- commits:
+    - body: null
+- version: 3.0.0
+- date: 2021-08-18T16:18:27Z
+- commits:
+    - hash: 4728a6d46761c05d0bd2c91ecbf422fd684410cc
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: major
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Prepares repo for landr
+- commits:
+    - body: null
+- commits:
+    - hash: 704a8c4661e82334cab3aeaf001fe8ee85390b52
+- commits:
+    - author: Balena CI
+- commits:
+    - subject: v2.1.0
+- commits:
+    - body: null
+- commits:
+    - hash: 5ea982b2c641e9ea46415bb7301b4e0ed048f13c
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Create LICENSE
+- commits:
+    - body: null
+- commits:
+    - hash: b15176a3af523695f3b7f6a94885d87acc1d04ae
+- commits:
+    - author: Balena CI
+- commits:
+    - subject: v2.1.1
+- commits:
+    - body: null
+- commits:
+    - hash: 0236a0fbcc6658e5ecc9c901e4837ad3c1a21dc4
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Merge branch 'master' into landr-prep
+- commits:
+    - body: null
+- version: 2.1.1
+- date: 2021-08-18T15:54:26Z
+- commits:
+    - hash: f8d36cdbe97f2c950e34cb52ae28851a1b00745f
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Create LICENSE
+- commits:
+    - body: null
+- version: 2.1.0
+- date: 2021-08-18T13:52:06Z
+- commits:
+    - hash: 67e782137eec9233c5f2e954f63174089ff47677
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: minor
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Updated package.json for rename and updated instructions
+- commits:
+    - body: null
+- commits:
+    - hash: 639757a7537ae861181b8f3c693789c1d6461b2f
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Updated build instruction and npm scripts help
+- commits:
+    - body: null
+- commits:
+    - hash: ee52ccd583d3e6a9e850fe3aae60634aa79cc2b2
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: minor
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Updated documentation to reflect breaking changes in previous release.
+- commits:
+    - body: null
+- commits:
+    - hash: 92da9d9c7d19c83ffbaf9291f43a56c267cf6a09
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Updated balena.yml
+- commits:
+    - body: null
+- commits:
+    - hash: b4a1c463a0459eaf447b4a7d7f394d665c2a4dba
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Aligned terminology with balenaBlock
+- commits:
+    - body: null
+- version: 2.0.1
+- date: 2021-08-17T08:47:44Z
+- commits:
+    - hash: c5de21717e72727a3756af6d786731198ba7c184
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Fixes issue with `lsusb` failing to exec and throwing an unhandled error
+- commits:
+    - body: null
+- commits:
+    - hash: 5d8203bb0b5af5f59b0e3aef4b6586e005474960
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Setting package.json to private to stop CI from publishing
+- commits:
+    - body: null
+- version: 2.0.0
+- date: 2021-08-12T16:02:32Z
+- commits:
+    - hash: 63c10c8adccde2e9d0cbadb4477c3522c62a0521
+- commits:
+    - author: curcuz
+- commits:
+    - footers:
+        change-type: major
+- commits:
+    - footers:
+        signed-off-by: Carlo Maria Curinga (@curcuz) <carlo@balena.io>
+- commits:
+    - subject: remove bash logic and refactor everything into es6
+- commits:
+    - body: null
+- version: 1.0.1
+- date: 2021-03-01T13:50:52Z
+- commits:
+    - hash: 2df11ac92f0bcca227364fd619bb58fbbbfde03e
+- commits:
+    - author: Tomás Migone
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Tomás Migone <tomas@balena.io>
+- commits:
+    - subject: "meta: run versionist to update balena.yml version"
+- commits:
+    - body: null
+- version: 1.0.0
+- date: 2021-02-25T14:52:07Z
+- commits:
+    - hash: 5ca049746d344ca3794c766ba0d2d1b497a01486
+- commits:
+    - author: Tomás Migone
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Tomás Migone <tomas@balena.io>
+- commits:
+    - subject: "meta: enable versionist"
+- commits:
+    - body: Take 2.
+- commits:
+    - hash: 00e8271c64884a2824429e4b4bc18ee07bd7e2c9
+- commits:
+    - author: Tomás Migone
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Tomás Migone <tomas@balena.io>
+- commits:
+    - subject: "meta: enable versionist"
+- commits:
+    - body: null
+- commits:
+    - hash: 1057b7f79d0d165e08569c87c837389be6904d1c
+- commits:
+    - author: Phil Wilson
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Phil Wilson <phil@balena.io>
+- commits:
+    - subject: logo again
+- commits:
+    - body: null
+- commits:
+    - hash: 2d67f42cecb57f665c24166d11cb2474261587a9
+- commits:
+    - author: Phil Wilson
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Phil Wilson <phil@balena.io>
+- commits:
+    - subject: hub meta
+- commits:
+    - body: null
+- commits:
+    - hash: 554d9c2e657340b16afc076380a23915c658b83c
+- commits:
+    - author: Phil Wilson
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Phil Wilson <phil@balena.io>
+- commits:
+    - subject: logo
+- commits:
+    - body: null
+- commits:
+    - hash: 90507fccf3c52de24bc5609076663dc634b611c6
+- commits:
+    - author: Phil Wilson
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Phil Wilson <phil@balena.io>
+- commits:
+    - subject: hub meta
+- commits:
+    - body: null
+- commits:
+    - hash: 9322b260922b0e52d817670f546f4fabe6ca3d91
+- commits:
+    - author: Phil Wilson
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Phil Wilson <phil@balena.io>
+- commits:
+    - subject: hub meta
+- commits:
+    - body: null
+- commits:
+    - hash: a49e11d9f35ae24411aa75a82a2b2209cd40842a
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alexbucknall@balena.io>
+- commits:
+    - subject: Fixed example to match expected service name
+- commits:
+    - body: null
+- commits:
+    - hash: f633c6d6e2dad61892ea333e48a11d3318fa639a
+- commits:
+    - author: Vipul Gupta
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Vipul Gupta (@vipulgupta2048) <vipul@balena.io>
+- commits:
+    - subject: Update docker-compose example
+- commits:
+    - body: "- Updated the `image` tag in docker-compose.yml example\r
+
+        \r"
+- commits:
+    - hash: 18739ff682fdd7e948ae07db82113ceb9483ac29
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alexbucknall@balena.io>
+- commits:
+    - subject: File structure fix and updated build instructions
+- commits:
+    - body: null
+- commits:
+    - hash: d822ac4dfdc8ac120eac0a2f607a027fecf935f5
+- commits:
+    - author: Phil Wilson
+- commits:
+    - footers:
+        change-type: minor
+- commits:
+    - footers:
+        signed-off-by: Phil Wilson <phil@balena.io>
+- commits:
+    - subject: Add CI file
+- commits:
+    - body: null
+- commits:
+    - hash: 4d08d1289cb6e3a17c67b7005f60873dd1218446
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: major
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alexbucknall@balena.io>
+- commits:
+    - subject: Updated file structure and addressed various issues
+- commits:
+    - body: >-
+        - File structure is updated to match similar blocks and to reduce
+        complexity
+
+        - Supervisor timeout is fixed by retrying after reboot/first power on
+
+        - Updated package.json to correct info
+- commits:
+    - hash: f791619f32ee1d7313b56c49aee732fe3c84ce7e
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: minor
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alexbucknall@balena.io>
+- commits:
+    - subject: Fixes issue with missing config variables
+- commits:
+    - body: null
+- commits:
+    - hash: 263a9b43e7b13208e6d54e675990e7b2df7b7838
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alexbucknall@balena.io>
+- commits:
+    - subject: Patch to support new fin v1.1.1
+- commits:
+    - body: null
+- commits:
+    - hash: f46189fdd58fe4a35a52865b71cbb0e5b46f21a9
+- commits:
+    - author: Chris Crocker-White
+- commits:
+    - subject: Fixing sleep example
+- commits:
+    - body: null
+- commits:
+    - hash: 403c4a1847c1afa61cdcf7a06e4577bc1e96fc1f
+- commits:
+    - author: Phil Wilson
+- commits:
+    - subject: trying to set tags
+- commits:
+    - body: null
+- commits:
+    - hash: 287c79342c1232e3f77580cb6dadade0afd0fa82
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Updated flasher utility for better failing
+- commits:
+    - body: null
+- commits:
+    - hash: 6ca28090c56a53128094862af2530f5dc06a1a7c
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Updated to use balena sdk + flashing now works
+- commits:
+    - body: null
+- commits:
+    - hash: 6fe23e99d35e167fcffca7b16a4c1f8c3385aac5
+- commits:
+    - author: Phil Wilson
+- commits:
+    - subject: download firmware where necessary
+- commits:
+    - body: null
+- commits:
+    - hash: 3c29e1289432585b415fde88f68da4612af85542
+- commits:
+    - author: Phil Wilson
+- commits:
+    - subject: fix
+- commits:
+    - body: null
+- commits:
+    - hash: 89918566120c62f4c16431fc8b869a5f3c92ef0d
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Added gitignore
+- commits:
+    - body: null
+- commits:
+    - hash: 3290c2eedc016f0594f376d2b8a1f5f1f26900ce
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Flashing should work correctly now
+- commits:
+    - body: null
+- commits:
+    - hash: 25f020754110c56c65120ab8c19debfa94b67a20
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Merge remote-tracking branch 'origin/flashing' into alex
+- commits:
+    - body: null
+- commits:
+    - hash: ba159cdfe3b3b67744da9da39b8bbb4a45f91c0e
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Updated for firmata repl
+- commits:
+    - body: null
+- commits:
+    - hash: 23ce0a14d6bdf0fdd540c4d78e9aae5ffdaf047a
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Started to add REPL
+- commits:
+    - body: null
+- commits:
+    - hash: 53e424f070d8e05c56ce8286b4e28c9f3400b1f9
+- commits:
+    - author: Phil Wilson
+- commits:
+    - subject: Added default firmware version download
+- commits:
+    - body: null
+- commits:
+    - hash: f0ab1d8aa8fd1fa99e66791b3e0a071d0110c86f
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Merge branch 'alex' of github.com:balena-io-playground/balenaFinBlock
+        into alex
+- commits:
+    - body: null
+- commits:
+    - hash: d26dc09be081eebb7d1b130fb09a2d61de89237f
+- commits:
+    - author: Phil Wilson
+- commits:
+    - subject: fix initial tag setting
+- commits:
+    - body: null
+- commits:
+    - hash: e49210c4a43c7e0e25193e06e6b73c1a2ed9f9a3
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: working on flashing issue
+- commits:
+    - body: null
+- commits:
+    - hash: 4d0a9e88dbfe43cc1e006b55597fa50f8456247c
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Fixed indirect wget
+- commits:
+    - body: null
+- commits:
+    - hash: d099c45488fdc23f2a2e9ca695b361f6957a7e74
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: cleaned up flashing
+- commits:
+    - body: null
+- commits:
+    - hash: 8ef8449b2a87c568aa7e02d5622138ce612adcbb
+- commits:
+    - author: Phil Wilson
+- commits:
+    - subject: async set tags
+- commits:
+    - body: null
+- commits:
+    - hash: 8699dc305cfc954ad7607c4c142d9ba7c20ad784
+- commits:
+    - author: Phil Wilson
+- commits:
+    - subject: Fixed firmware endpoint and tag
+- commits:
+    - body: null
+- commits:
+    - hash: 309745ab29bef9976ea95e3ec8c31900b5b8848f
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: tweaks to flashing
+- commits:
+    - body: null
+- commits:
+    - hash: bf0180a84a8fee88ea6d00c33c5cf2820dff1fc7
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Merge branch 'alex' of github.com:balena-io-playground/balenaFinBlock
+        into alex
+- commits:
+    - body: null
+- commits:
+    - hash: a3eb44ee2d6a2d214d2df343ad506ee3a4d6028e
+- commits:
+    - author: Phil Wilson
+- commits:
+    - subject: sleep tag fixed
+- commits:
+    - body: null
+- commits:
+    - hash: 3c87b316bad884a849090398e7b47df5ad32c50b
+- commits:
+    - author: Phil Wilson
+- commits:
+    - subject: Merge
+- commits:
+    - body: null
+- commits:
+    - hash: b6cc7fd109c1459c15e9be960428a0339a06938d
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: tweaks to envar and tags
+- commits:
+    - body: null
+- commits:
+    - hash: 0d2f5ef3cd41b1379da535c9b8d1f77019d38f43
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Merge branch 'alex' of github.com:balena-io-playground/balenaFinBlock
+        into alex
+- commits:
+    - body: null
+- commits:
+    - hash: 7400f1adfb2cb1959ff9a3eae71520d00188016e
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Should be working
+- commits:
+    - body: null
+- commits:
+    - hash: 78d7d63a6f76c4ad3c26acc84d4a3456fbd1e166
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Fixed new firmata download handling
+- commits:
+    - body: null
+- commits:
+    - hash: adbd384240c3e1a30212e0a054e2f9101be9814e
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Fixed unnecessary catch
+- commits:
+    - body: null
+- commits:
+    - hash: 6b14f6cfb68068e488dbb077e4d8ef2f6963b475
+- commits:
+    - author: Phil Wilson
+- commits:
+    - subject: volume changes
+- commits:
+    - body: null
+- commits:
+    - hash: 74c2e9c39d25ec5787eb06b2668bac01c8f87d98
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Fixed user version pinning
+- commits:
+    - body: null
+- commits:
+    - hash: 0894f44e3ac4d371a5125b67a9520be61be89ad5
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - subject: Merge remote-tracking branch 'origin/phil' into alex
+- commits:
+    - body: null

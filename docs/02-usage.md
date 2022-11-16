@@ -91,7 +91,7 @@ with the following payload:
 ```json
 {
   "sleepTime" : 60,
-  "sleepDelay" : 1
+  "sleepDelay" : 10
 }
 ```
 

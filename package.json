@@ -3,6 +3,9 @@
   "version": "1.1.0",
   "description": "balenaBlock that provides a simple interface for controlling the balenaFin. This includes access to manufacturing information, flashing and controlling the coprocessor and sleeping the balenaFin.",
   "main": "index.js",
+  "engines": {
+    "node": "12.x"
+  },
   "scripts": {
     "test": "mocha",
     "build-local-registry": "docker run -d -p 5000:5000 --name registry registry:2.7",

@@ -7,12 +7,12 @@
     "test": "mocha",
     "build-local-registry": "docker run -d -p 5000:5000 --name registry registry:2.7",
     "build-local": "docker buildx build -t localhost:5000/fin:latest --platform linux/arm/v7 --push --file Dockerfile.template .",
-    "build-release": "docker buildx build -t balenablocks/fin:latest --platform linux/arm/v7 --push --file Dockerfile.template .",
+    "build-release": "docker buildx build -t bh.cr/balenalabs/fin:latest --platform linux/arm/v7 --push --file Dockerfile.template .",
     "build-balena-example": "balena deploy --build --source example/ $npm_config_app"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/balenablocks/fin.git"
+    "url": "git+https://github.com/balena-labs-project/fin-block.git"
   },
   "private": true,
   "keywords": [
@@ -37,9 +37,9 @@
     "esversion": 8
   },
   "bugs": {
-    "url": "https://github.com/balenablocks/fin/issues"
+    "url": "https://github.com/balenalabs/fin-block/issues"
   },
-  "homepage": "https://github.com/balenablocks/fin#readme",
+  "homepage": "https://github.com/balenalabs/fin-block#readme",
   "dependencies": {
     "balena-sdk": "^15.46.1",
     "bcrypt": "^5.0.1",

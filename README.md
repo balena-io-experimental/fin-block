@@ -1,6 +1,6 @@
-![logo](https://raw.githubusercontent.com/balenablocks/fin/master/images/logo.png)
+![logo](https://raw.githubusercontent.com/balena-labs-project/fin-block/master/images/logo.png)
 
-[![balena](https://github.com/balenablocks/fin-block/actions/workflows/balena.yml/badge.svg)](https://github.com/balenablocks/browser/actions/workflows/balena.yml)
+[![balena](https://github.com/balena-labs-project/fin-block/actions/workflows/flowzone.yml/badge.svg)](https://github.com/balena-labs-project/fin-block/actions/workflows/flowzone.yml)
 
 **The fin block is a balenaBlock that provides flashing utilities, status tagging, sleep control and firmata control functionality of the [balenaFin](https://www.balena.io/fin/).**
 
@@ -14,7 +14,7 @@
 
 Use this as standalone with the button below:
 
-[![fin block deploy with balena](https://balena.io/deploy.svg)](https://dashboard.balena-cloud.com/deploy?repoUrl=https://github.com/balenablocks/fin)
+[![fin block deploy with balena](https://balena.io/deploy.svg)](https://dashboard.balena-cloud.com/deploy?repoUrl=https://github.com/balena-labs-project/fin-block)
 
 Or add the following service to your `docker-compose.yml`:
 
@@ -25,7 +25,7 @@ volumes:
 services:
   fin:
     restart: always
-    image: bh.cr/balenablocks/fin-block 
+    image: bh.cr/balenalabs/fin-block 
     network_mode: host
     privileged: true
     volumes:
@@ -49,7 +49,7 @@ Head over to our docs for detailed installation and usage instructions, customiz
 
 ## Motivation
 
-![fin](https://raw.githubusercontent.com/balenablocks/fin/master/images/fin.png)
+![fin](https://raw.githubusercontent.com/balena-labs-project/fin-block/master/images/fin.png)
 
 The [balenaFin](https://www.balena.io/fin/) is a Raspberry Pi Compute Module carrier board that can run all the software that the Raspberry Pi can run, but hardened for deployment in the field.
 Even better, it’s offered at an accessible price point relative to other professional boards.
@@ -57,7 +57,7 @@ This block allows you to easily utilise some of the more advanced features the b
 
 ## Notes
 
-The fin block is now maintained at balena's registry and the image can be found at `bh.cr/balenablocks/fin-block`.
+The fin block is now maintained at balena's registry and the image can be found at `bh.cr/balenalabs/fin-block`.
 The image is still maintained at Docker Hub (`balenablocks/finabler`) but will no longer be updated, so please switch to balena's registry if you wish to use the latest version.
 
 ## Contributing
@@ -66,8 +66,8 @@ Do you want to help make balenaSense better? Take a look at our Contributing Gui
 
 ## Getting Help
 
-If you're having any problem, please [raise an issue](https://github.com/balenablocks/fin/issues/new) on GitHub and we will be happy to help.
+If you're having any problem, please [raise an issue](https://github.com/balena-labs-project/fin-block/issues/new) on GitHub and we will be happy to help.
 
 ## License
 
-fin-block is free software, and may be redistributed under the terms specified in the [license](https://github.com/balenablocks/fin/blob/master/LICENSE).
+fin-block is free software, and may be redistributed under the terms specified in the [license](https://github.com/balena-labs-project/fin-block/blob/master/LICENSE).

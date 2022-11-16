@@ -11,7 +11,7 @@ volumes:
 services:
   fin:
     restart: always
-    image: balenablocks/fin:latest
+    image: bh.cr/balenalabs/fin-block
     network_mode: host
     privileged: true
     volumes:

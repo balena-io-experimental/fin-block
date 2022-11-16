@@ -5,7 +5,7 @@ description: >-
   tagging, sleep control and firmata control functionality of the balenaFin.
 
 post-provisioning: >-
-  [![balena](https://github.com/balenablocks/fin-block/actions/workflows/balena.yml/badge.svg)](https://github.com/balenablocks/browser/actions/workflows/balena.yml)
+  [![balena](https://github.com/balena-labs-project/fin-block/actions/workflows/balena.yml/badge.svg)](https://github.com/balena-labs-project/browser/actions/workflows/balena.yml)
 
   ## Usage instructions 
 
@@ -13,7 +13,7 @@ post-provisioning: >-
     
     ```
     fin:
-      image: bh.cr/balenablocks/fin-block 
+      image: bh.cr/balenalabs/fin-block 
       restart: always # required for flashing coprocessor and setting DT Overlay Params 
       network_mode: host
       privileged: true
@@ -34,7 +34,7 @@ post-provisioning: >-
 
     ```
       fin:
-        image: bh.cr/balenablocks/fin-block/<version>
+        image: bh.cr/balenalabs/fin-block/<version>
         ...
     ```
 
@@ -45,11 +45,11 @@ assets:
   repository:
     type: blob.asset
     data:
-      url: "https://github.com/balenablocks/fin"
+      url: "https://github.com/balena-labs-project/fin-block"
   logo:
     type: blob.asset
     data:
-      url: "https://raw.githubusercontent.com/balenablocks/fin/main/images/icon.png"
+      url: "https://raw.githubusercontent.com/balena-labs-project/fin-block/main/images/icon.png"
 data:
   defaultDeviceType: fincm3
   supportedDeviceTypes:

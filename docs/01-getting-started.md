@@ -18,7 +18,7 @@ The block will identify hardware version of the device and configure itself acco
 
 The easiest way to get started controlling the [balenaFin](https://balena.io/fin) is to deploy this block to your fleet using the button below.
 
-[![fin block deploy with balena](https://balena.io/deploy.svg)](https://dashboard.balena-cloud.com/deploy?repoUrl=https://github.com/balenablocks/fin)
+[![fin block deploy with balena](https://balena.io/deploy.svg)](https://dashboard.balena-cloud.com/deploy?repoUrl=https://github.com/balena-labs-project/fin-block)
 
 For more advanced use cases, you can build the block as a service alongside other docker services in your `docker-compose.yml` file.
 An example is shown below:
@@ -30,7 +30,7 @@ volumes:
 services:
   fin:
     restart: always
-    image: balenablocks/fin:latest
+    image: bh.cr/balenalabs/fin-block
     network_mode: host
     privileged: true
     volumes:

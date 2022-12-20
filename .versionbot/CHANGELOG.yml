@@ -1,4 +1,20 @@
 - commits:
+    - subject: Add documentation for outside release usage
+      hash: 4f623c5864fbcfc68a32929de0caa55fb0010983
+      body: |
+        The fin block image can be used outside of a fleet release.
+        For example for ad hoc or sporadic usage on FIN devices.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: fisehara <harald@balena.io>
+        signed-off-by: fisehara <harald@balena.io>
+      author: fisehara
+      nested: []
+  version: 3.8.3
+  title: ""
+  date: 2022-12-20T20:23:31.860Z
+- commits:
     - subject: moving from balenablocks to balena-labs-projects
       hash: ddc049b07f70ea9c7ee960a71ed522fab2164ca3
       body: ""
